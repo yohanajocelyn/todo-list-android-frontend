@@ -47,13 +47,13 @@ class AuthenticationViewModel: ViewModel() {
             if(currentState.showPassword) {
                 currentState.copy(
                     showPassword = false,
-                    passwordVisibility = VisualTransformation.None,
+                    passwordVisibility = PasswordVisualTransformation(),
                     passwordVisibilityIcon = R.drawable.ic_password_visible
                 )
             } else {
                 currentState.copy(
                     showPassword = true,
-                    passwordVisibility = PasswordVisualTransformation(),
+                    passwordVisibility = VisualTransformation.None,
                     passwordVisibilityIcon = R.drawable.ic_password_invisible
                 )
             }
