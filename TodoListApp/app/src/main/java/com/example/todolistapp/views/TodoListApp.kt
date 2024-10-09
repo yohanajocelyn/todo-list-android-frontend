@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,6 +19,8 @@ import com.example.todolistapp.enums.PagesEnum
 fun TodoListApp(
     navController: NavHostController = rememberNavController()
 ) {
+    val focusManager = LocalFocusManager.current
+
     NavHost(navController = navController, startDestination = PagesEnum.Login.name) {
         composable(route = PagesEnum.Login.name) {
             LoginView(
@@ -30,7 +33,8 @@ fun TodoListApp(
                             inclusive = true
                         }
                     }
-                }
+                },
+                focusManager = focusManager
             )
         }
 
@@ -45,7 +49,8 @@ fun TodoListApp(
                             inclusive = true
                         }
                     }
-                }
+                },
+                focusManager = focusManager
             )
         }
     }

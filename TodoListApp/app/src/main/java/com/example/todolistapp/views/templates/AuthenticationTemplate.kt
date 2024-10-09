@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -14,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,16 +25,18 @@ import com.example.todolistapp.R
 
 @Composable
 fun GeneralOutlinedTextField(
-    usernameInput: String,
-    onUsernameInputValueChange: (String) -> Unit,
+    inputValue: String,
+    onInputValueChange: (String) -> Unit,
     labelText: String,
     placeholderText: String,
     leadingIconSrc: Painter,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    keyboardType: KeyboardOptions,
+    onKeyboardNext: KeyboardActions
 ) {
     OutlinedTextField(
-        value = usernameInput,
-        onValueChange = onUsernameInputValueChange,
+        value = inputValue,
+        onValueChange = onInputValueChange,
         singleLine = true,
         label = {
             Text(
@@ -49,7 +55,9 @@ fun GeneralOutlinedTextField(
                 painter = leadingIconSrc,
                 contentDescription = null
             )
-        }
+        },
+        keyboardOptions = keyboardType,
+        keyboardActions = onKeyboardNext
     )
 }
 
@@ -62,7 +70,9 @@ fun PasswordOutlinedTextField(
     placeholderText: String,
     onTrailingIconClick: () -> Unit,
     passwordVisibility: VisualTransformation,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onKeyboardNext: KeyboardActions,
+    keyboardImeAction: ImeAction
 ) {
     OutlinedTextField(
         value = passwordInput,
@@ -96,7 +106,12 @@ fun PasswordOutlinedTextField(
                 painter = painterResource(id = R.drawable.ic_password),
                 contentDescription = null
             )
-        }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = keyboardImeAction
+        ),
+        keyboardActions = onKeyboardNext
     )
 }
 

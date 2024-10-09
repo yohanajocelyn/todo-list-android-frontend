@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -20,10 +22,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,7 +49,8 @@ import com.example.todolistapp.views.templates.PasswordOutlinedTextField
 fun LoginView(
     authenticationViewModel: AuthenticationViewModel = viewModel(),
     onSignUpTextClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    focusManager: FocusManager
 ) {
     val loginUIState by authenticationViewModel.authenticationUIState.collectAsState()
 
@@ -56,13 +64,13 @@ fun LoginView(
             Text(
                 text = "WELCOME BACK TO",
                 fontSize = 35.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Light
             )
 
             Text(
                 text = "TODO LIST",
                 fontSize = 35.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.SemiBold
             )
         }
 
@@ -70,15 +78,24 @@ fun LoginView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             GeneralOutlinedTextField(
-                usernameInput = authenticationViewModel.usernameInput,
-                onUsernameInputValueChange = {
-                    authenticationViewModel.changeUsernameInput(it)
+                inputValue = authenticationViewModel.emailInput,
+                onInputValueChange = {
+                    authenticationViewModel.changeEmailInput(it)
                 },
-                labelText = stringResource(id = R.string.usernameText),
-                placeholderText = stringResource(id = R.string.usernameText),
-                leadingIconSrc = painterResource(id = R.drawable.ic_username),
+                labelText = stringResource(id = R.string.emailText),
+                placeholderText = stringResource(id = R.string.emailText),
+                leadingIconSrc = painterResource(id = R.drawable.ic_email),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                keyboardType = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                onKeyboardNext = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                )
             )
 
             Spacer(modifier = Modifier.padding(5.dp))
@@ -96,7 +113,11 @@ fun LoginView(
                 },
                 passwordVisibility = loginUIState.passwordVisibility,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                keyboardImeAction = ImeAction.None,
+                onKeyboardNext = KeyboardActions(
+                    onDone = null
+                )
             )
 
             AuthenticationButton(
@@ -134,7 +155,8 @@ fun LoginViewPreview() {
                 .padding(20.dp),
             onSignUpTextClicked = {
 
-            }
+            },
+            focusManager = LocalFocusManager.current
         )
     }
 }

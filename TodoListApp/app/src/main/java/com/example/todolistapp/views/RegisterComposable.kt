@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -19,10 +21,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,7 +46,8 @@ import com.example.todolistapp.views.templates.PasswordOutlinedTextField
 fun RegisterView(
     authenticationViewModel: AuthenticationViewModel = viewModel(),
     onSignInTextClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    focusManager: FocusManager
 ) {
     val registerUIState by authenticationViewModel.authenticationUIState.collectAsState()
 
@@ -47,7 +55,7 @@ fun RegisterView(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         Column(
             horizontalAlignment = Alignment.Start
@@ -55,7 +63,7 @@ fun RegisterView(
             Text(
                 text = "WELCOME TO",
                 fontSize = 35.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Light
             )
 
             Text(
@@ -70,15 +78,47 @@ fun RegisterView(
         ) {
 
             GeneralOutlinedTextField(
-                usernameInput = authenticationViewModel.usernameInput,
-                onUsernameInputValueChange = {
+                inputValue = authenticationViewModel.emailInput,
+                onInputValueChange = {
+                    authenticationViewModel.changeEmailInput(it)
+                },
+                labelText = stringResource(id = R.string.emailText),
+                placeholderText = stringResource(id = R.string.emailText),
+                leadingIconSrc = painterResource(id = R.drawable.ic_email),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                keyboardType = KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+                onKeyboardNext = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                )
+            )
+
+            Spacer(modifier = Modifier.padding(5.dp))
+
+            GeneralOutlinedTextField(
+                inputValue = authenticationViewModel.usernameInput,
+                onInputValueChange = {
                     authenticationViewModel.changeUsernameInput(it)
                 },
                 labelText = stringResource(id = R.string.usernameText),
                 placeholderText = stringResource(id = R.string.usernameText),
                 leadingIconSrc = painterResource(id = R.drawable.ic_username),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                keyboardType = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                ),
+                onKeyboardNext = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                )
             )
 
             Spacer(modifier = Modifier.padding(5.dp))
@@ -97,7 +137,13 @@ fun RegisterView(
                 },
                 passwordVisibility = registerUIState.passwordVisibility,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                keyboardImeAction = ImeAction.Next,
+                onKeyboardNext = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                )
             )
 
             Spacer(modifier = Modifier.padding(5.dp))
@@ -106,17 +152,21 @@ fun RegisterView(
             PasswordOutlinedTextField(
                 passwordInput = authenticationViewModel.confirmPasswordInput,
                 onPasswordInputValueChange = {
-                    authenticationViewModel.changeConfirmPassword(it)
+                    authenticationViewModel.changeConfirmPasswordInput(it)
                 },
-                passwordVisibilityIcon = painterResource(id = registerUIState.passwordVisibilityIcon),
+                passwordVisibilityIcon = painterResource(id = registerUIState.confirmPasswordVisibilityIcon),
                 labelText = stringResource(id = R.string.confirm_password_text),
                 placeholderText = stringResource(id = R.string.confirm_password_text),
                 onTrailingIconClick = {
-                    authenticationViewModel.changePasswordVisibility()
+                    authenticationViewModel.changeConfirmPasswordVisibility()
                 },
-                passwordVisibility = registerUIState.passwordVisibility,
+                passwordVisibility = registerUIState.confirmPasswordVisibility,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                keyboardImeAction = ImeAction.None,
+                onKeyboardNext = KeyboardActions(
+                    onDone = null
+                )
             )
 
             AuthenticationButton(
@@ -154,7 +204,8 @@ fun RegisterViewPreview() {
                 .padding(20.dp),
             onSignInTextClicked = {
 
-            }
+            },
+            focusManager = LocalFocusManager.current
         )
     }
 }
