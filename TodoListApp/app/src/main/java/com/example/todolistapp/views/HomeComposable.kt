@@ -52,7 +52,7 @@ fun HomeView(
                 color = Color.Black
             )
             Text(
-                text = "Asdf",
+                text = "Asdf", // TODO: put username data here
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black
