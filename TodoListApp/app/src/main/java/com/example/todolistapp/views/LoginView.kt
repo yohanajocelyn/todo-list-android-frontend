@@ -43,6 +43,7 @@ fun LoginView(
     onSignInButtonClicked: () -> Unit
 ) {
     val loginUIState by authenticationViewModel.authenticationUIState.collectAsState()
+    val loginButtonEnabled = authenticationViewModel.checkLoginForm()
 
     Column(
         modifier = modifier,
@@ -71,6 +72,7 @@ fun LoginView(
                 inputValue = authenticationViewModel.emailInput,
                 onInputValueChange = {
                     authenticationViewModel.changeEmailInput(it)
+                    authenticationViewModel.checkLoginForm()
                 },
                 labelText = stringResource(id = R.string.emailText),
                 placeholderText = stringResource(id = R.string.emailText),
@@ -94,6 +96,7 @@ fun LoginView(
                 passwordInput = authenticationViewModel.passwordInput,
                 onPasswordInputValueChange = {
                     authenticationViewModel.changePasswordInput(it)
+                    authenticationViewModel.checkLoginForm()
                 },
                 passwordVisibilityIcon = painterResource(id = loginUIState.passwordVisibilityIcon),
                 labelText = stringResource(id = R.string.passwordText),
@@ -117,8 +120,8 @@ fun LoginView(
                     .padding(top = 30.dp),
                 textModifier = Modifier
                     .padding(vertical = 5.dp, horizontal = 15.dp),
-                buttonEnabled = authenticationViewModel.checkLoginForm(),
-                authenticationViewModel = authenticationViewModel
+                buttonEnabled = loginUIState.buttonEnabled,
+                buttonColor = authenticationViewModel.checkButtonEnabled(loginUIState.buttonEnabled)
             )
         }
 

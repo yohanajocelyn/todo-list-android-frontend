@@ -10,5 +10,6 @@ data class AuthenticationUIState(
     val passwordVisibility: VisualTransformation = PasswordVisualTransformation(),
     val confirmPasswordVisibility: VisualTransformation = PasswordVisualTransformation(),
     val passwordVisibilityIcon: Int = R.drawable.ic_password_visible,
-    val confirmPasswordVisibilityIcon: Int = R.drawable.ic_password_visible
+    val confirmPasswordVisibilityIcon: Int = R.drawable.ic_password_visible,
+    val buttonEnabled: Boolean = false
 )

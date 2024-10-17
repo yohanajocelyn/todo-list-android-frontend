@@ -2,6 +2,7 @@ package com.example.todolistapp.viewModels
 
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -88,20 +89,36 @@ class AuthenticationViewModel : ViewModel() {
         }
     }
 
-    fun checkLoginForm(): Boolean {
+    fun checkLoginForm() {
         if (emailInput.isNotEmpty() && passwordInput.isNotEmpty()) {
-            return true
+            _authenticationUIState.update { currentState ->
+                currentState.copy(
+                    buttonEnabled = true
+                )
+            }
+        } else {
+            _authenticationUIState.update { currentState ->
+                currentState.copy(
+                    buttonEnabled = false
+                )
+            }
         }
-
-        return false
     }
 
-    fun checkRegisterForm(): Boolean {
+    fun checkRegisterForm() {
         if (emailInput.isNotEmpty() && passwordInput.isNotEmpty() && usernameInput.isNotEmpty() && confirmPasswordInput.isNotEmpty() && passwordInput == confirmPasswordInput) {
-            return true
+            _authenticationUIState.update { currentState ->
+                currentState.copy(
+                    buttonEnabled = true
+                )
+            }
+        } else {
+            _authenticationUIState.update { currentState ->
+                currentState.copy(
+                    buttonEnabled = false
+                )
+            }
         }
-
-        return false
     }
 
     fun checkButtonEnabled(isEnabled: Boolean): Color {

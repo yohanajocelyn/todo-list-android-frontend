@@ -1,8 +1,18 @@
 package com.example.todolistapp.views
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun CreateTodoListView() {
 
+}
+
+@Preview(
+    showSystemUi = true,
+    showBackground = true
+)
+@Composable
+fun CreateTodoListViewPreview() {
+    CreateTodoListView()
 }

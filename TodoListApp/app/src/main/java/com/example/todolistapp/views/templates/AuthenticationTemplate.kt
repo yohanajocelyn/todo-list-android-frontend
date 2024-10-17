@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -124,12 +125,13 @@ fun AuthenticationButton(
     buttonModifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
     buttonEnabled: Boolean,
-    authenticationViewModel: AuthenticationViewModel
+    buttonColor: Color
 ) {
     Button(
         onClick = onButtonClick,
         modifier = buttonModifier,
-        colors = ButtonDefaults.buttonColors(authenticationViewModel.checkButtonEnabled(buttonEnabled)),
+        colors = ButtonDefaults.buttonColors(buttonColor),
+        enabled = buttonEnabled
     ) {
         Text(
             text = buttonText,

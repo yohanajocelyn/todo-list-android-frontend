@@ -74,6 +74,7 @@ fun RegisterView(
                 inputValue = authenticationViewModel.emailInput,
                 onInputValueChange = {
                     authenticationViewModel.changeEmailInput(it)
+                    authenticationViewModel.checkRegisterForm()
                 },
                 labelText = stringResource(id = R.string.emailText),
                 placeholderText = stringResource(id = R.string.emailText),
@@ -97,6 +98,7 @@ fun RegisterView(
                 inputValue = authenticationViewModel.usernameInput,
                 onInputValueChange = {
                     authenticationViewModel.changeUsernameInput(it)
+                    authenticationViewModel.checkRegisterForm()
                 },
                 labelText = stringResource(id = R.string.usernameText),
                 placeholderText = stringResource(id = R.string.usernameText),
@@ -121,6 +123,7 @@ fun RegisterView(
                 passwordInput = authenticationViewModel.passwordInput,
                 onPasswordInputValueChange = {
                     authenticationViewModel.changePasswordInput(it)
+                    authenticationViewModel.checkRegisterForm()
                 },
                 passwordVisibilityIcon = painterResource(id = registerUIState.passwordVisibilityIcon),
                 labelText = stringResource(id = R.string.passwordText),
@@ -146,6 +149,7 @@ fun RegisterView(
                 passwordInput = authenticationViewModel.confirmPasswordInput,
                 onPasswordInputValueChange = {
                     authenticationViewModel.changeConfirmPasswordInput(it)
+                    authenticationViewModel.checkRegisterForm()
                 },
                 passwordVisibilityIcon = painterResource(id = registerUIState.confirmPasswordVisibilityIcon),
                 labelText = stringResource(id = R.string.confirm_password_text),
@@ -169,8 +173,8 @@ fun RegisterView(
                     .padding(top = 30.dp),
                 textModifier = Modifier
                     .padding(vertical = 5.dp, horizontal = 15.dp),
-                buttonEnabled = authenticationViewModel.checkRegisterForm(),
-                authenticationViewModel = authenticationViewModel
+                buttonEnabled = registerUIState.buttonEnabled,
+                buttonColor = authenticationViewModel.checkButtonEnabled(registerUIState.buttonEnabled)
             )
         }
 
