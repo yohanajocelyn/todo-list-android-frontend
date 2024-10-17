@@ -1,21 +1,13 @@
 package com.example.todolistapp.views
 
-import android.graphics.Paint.Align
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,8 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
 import com.example.todolistapp.ui.theme.TodoListAppTheme
 import com.example.todolistapp.viewModels.AuthenticationViewModel
@@ -50,7 +39,8 @@ fun LoginView(
     authenticationViewModel: AuthenticationViewModel = viewModel(),
     onSignUpTextClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    onSignInButtonClicked: () -> Unit
 ) {
     val loginUIState by authenticationViewModel.authenticationUIState.collectAsState()
 
@@ -122,13 +112,13 @@ fun LoginView(
 
             AuthenticationButton(
                 buttonText = stringResource(id = R.string.loginText),
-                onButtonClick = {
-
-                },
+                onButtonClick = onSignInButtonClicked,
                 buttonModifier = Modifier
                     .padding(top = 30.dp),
                 textModifier = Modifier
-                    .padding(vertical = 5.dp, horizontal = 15.dp)
+                    .padding(vertical = 5.dp, horizontal = 15.dp),
+                buttonEnabled = authenticationViewModel.checkLoginForm(),
+                authenticationViewModel = authenticationViewModel
             )
         }
 
@@ -137,7 +127,7 @@ fun LoginView(
             actionText = stringResource(id = R.string.sign_up_text),
             onActionTextClicked = onSignUpTextClicked,
             rowModifier = Modifier
-                .align(Alignment.CenterHorizontally)
+                .align(Alignment.CenterHorizontally),
         )
     }
 }
@@ -156,7 +146,10 @@ fun LoginViewPreview() {
             onSignUpTextClicked = {
 
             },
-            focusManager = LocalFocusManager.current
+            focusManager = LocalFocusManager.current,
+            onSignInButtonClicked = {
+
+            }
         )
     }
 }

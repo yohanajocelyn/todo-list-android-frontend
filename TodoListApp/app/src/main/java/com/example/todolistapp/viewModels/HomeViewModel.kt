@@ -1,18 +1,22 @@
 package com.example.todolistapp.viewModels
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import com.example.todolistapp.uiStates.HomeUIState
+import com.example.todolistapp.enums.PrioritiesEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class HomeViewModel: ViewModel() {
-    private val _homeUIState = MutableStateFlow(HomeUIState())
-
-    val homeUIState: StateFlow<HomeUIState>
-        get() {
-            return _homeUIState.asStateFlow()
+    fun changePriorityTextBackgroundColor(
+        priority: PrioritiesEnum
+    ): Color {
+        if (priority == PrioritiesEnum.High) {
+            return Color.Red
+        } else if (priority == PrioritiesEnum.Medium) {
+            return Color.Yellow
         }
 
-
+        return Color.Green
+    }
 }

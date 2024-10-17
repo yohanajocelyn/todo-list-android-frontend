@@ -34,7 +34,14 @@ fun TodoListApp(
                         }
                     }
                 },
-                focusManager = focusManager
+                focusManager = focusManager,
+                onSignInButtonClicked = {
+                    navController.navigate(PagesEnum.Home.name) {
+                        popUpTo(PagesEnum.Login.name) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
         }
 
@@ -50,8 +57,32 @@ fun TodoListApp(
                         }
                     }
                 },
-                focusManager = focusManager
+                focusManager = focusManager,
+                onSignUpButtonClicked = {
+                    navController.navigate(PagesEnum.Home.name) {
+                        popUpTo(PagesEnum.Register.name) {
+                            inclusive = true
+                        }
+                    }
+                }
             )
+        }
+
+        composable(route = PagesEnum.Home.name) {
+            HomeView(
+                onAddButtonClicked = {
+                    // TODO: Buat kelas CreateTodoView
+                    navController.navigate(PagesEnum.CreateTodo.name) {
+                        popUpTo(PagesEnum.Home.name) {
+                            inclusive = false
+                        }
+                    }
+                }
+            )
+        }
+
+        composable(route = PagesEnum.CreateTodo.name) {
+            CreateTodoListView()
         }
     }
 }

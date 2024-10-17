@@ -21,7 +21,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todolistapp.R
+import com.example.todolistapp.viewModels.AuthenticationViewModel
 
 @Composable
 fun GeneralOutlinedTextField(
@@ -120,12 +122,14 @@ fun AuthenticationButton(
     buttonText: String,
     onButtonClick: () -> Unit,
     buttonModifier: Modifier = Modifier,
-    textModifier: Modifier = Modifier
+    textModifier: Modifier = Modifier,
+    buttonEnabled: Boolean,
+    authenticationViewModel: AuthenticationViewModel
 ) {
     Button(
-        onClick = {},
+        onClick = onButtonClick,
         modifier = buttonModifier,
-        colors = ButtonDefaults.buttonColors(Color.Blue)
+        colors = ButtonDefaults.buttonColors(authenticationViewModel.checkButtonEnabled(buttonEnabled)),
     ) {
         Text(
             text = buttonText,

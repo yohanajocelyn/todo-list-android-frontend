@@ -1,20 +1,13 @@
 package com.example.todolistapp.views
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,7 +39,8 @@ fun RegisterView(
     authenticationViewModel: AuthenticationViewModel = viewModel(),
     onSignInTextClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    onSignUpButtonClicked: () -> Unit
 ) {
     val registerUIState by authenticationViewModel.authenticationUIState.collectAsState()
 
@@ -171,13 +164,13 @@ fun RegisterView(
 
             AuthenticationButton(
                 buttonText = stringResource(id = R.string.registerText),
-                onButtonClick = {
-
-                },
+                onButtonClick = onSignUpButtonClicked,
                 buttonModifier = Modifier
                     .padding(top = 30.dp),
                 textModifier = Modifier
-                    .padding(vertical = 5.dp, horizontal = 15.dp)
+                    .padding(vertical = 5.dp, horizontal = 15.dp),
+                buttonEnabled = authenticationViewModel.checkRegisterForm(),
+                authenticationViewModel = authenticationViewModel
             )
         }
 
@@ -205,7 +198,10 @@ fun RegisterViewPreview() {
             onSignInTextClicked = {
 
             },
-            focusManager = LocalFocusManager.current
+            focusManager = LocalFocusManager.current,
+            onSignUpButtonClicked = {
+
+            }
         )
     }
 }

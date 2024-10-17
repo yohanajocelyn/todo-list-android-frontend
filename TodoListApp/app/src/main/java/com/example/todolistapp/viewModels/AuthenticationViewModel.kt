@@ -1,8 +1,11 @@
 package com.example.todolistapp.viewModels
 
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.lifecycle.ViewModel
@@ -13,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import com.example.todolistapp.R
 
-class AuthenticationViewModel: ViewModel() {
+class AuthenticationViewModel : ViewModel() {
     private val _authenticationUIState = MutableStateFlow(AuthenticationUIState())
 
     val authenticationUIState: StateFlow<AuthenticationUIState>
@@ -51,7 +54,7 @@ class AuthenticationViewModel: ViewModel() {
 
     fun changePasswordVisibility() {
         _authenticationUIState.update { currentState ->
-            if(currentState.showPassword) {
+            if (currentState.showPassword) {
                 currentState.copy(
                     showPassword = false,
                     passwordVisibility = PasswordVisualTransformation(),
@@ -69,7 +72,7 @@ class AuthenticationViewModel: ViewModel() {
 
     fun changeConfirmPasswordVisibility() {
         _authenticationUIState.update { currentState ->
-            if(currentState.showConfirmPassword) {
+            if (currentState.showConfirmPassword) {
                 currentState.copy(
                     showConfirmPassword = false,
                     confirmPasswordVisibility = PasswordVisualTransformation(),
@@ -83,5 +86,29 @@ class AuthenticationViewModel: ViewModel() {
                 )
             }
         }
+    }
+
+    fun checkLoginForm(): Boolean {
+        if (emailInput.isNotEmpty() && passwordInput.isNotEmpty()) {
+            return true
+        }
+
+        return false
+    }
+
+    fun checkRegisterForm(): Boolean {
+        if (emailInput.isNotEmpty() && passwordInput.isNotEmpty() && usernameInput.isNotEmpty() && confirmPasswordInput.isNotEmpty() && passwordInput == confirmPasswordInput) {
+            return true
+        }
+
+        return false
+    }
+
+    fun checkButtonEnabled(isEnabled: Boolean): Color {
+        if (isEnabled) {
+            return Color.Blue
+        }
+
+        return Color.LightGray
     }
 }
