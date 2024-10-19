@@ -31,7 +31,7 @@ import com.example.todolistapp.ui.theme.TodoListAppTheme
 import com.example.todolistapp.viewModels.AuthenticationViewModel
 import com.example.todolistapp.views.templates.AuthenticationButton
 import com.example.todolistapp.views.templates.AuthenticationQuestion
-import com.example.todolistapp.views.templates.GeneralOutlinedTextField
+import com.example.todolistapp.views.templates.AuthenticationOutlinedTextField
 import com.example.todolistapp.views.templates.PasswordOutlinedTextField
 
 @Composable
@@ -45,9 +45,7 @@ fun RegisterView(
     val registerUIState by authenticationViewModel.authenticationUIState.collectAsState()
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
+        modifier = modifier,
         verticalArrangement = Arrangement.SpaceEvenly,
     ) {
         Column(
@@ -70,7 +68,7 @@ fun RegisterView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            GeneralOutlinedTextField(
+            AuthenticationOutlinedTextField(
                 inputValue = authenticationViewModel.emailInput,
                 onInputValueChange = {
                     authenticationViewModel.changeEmailInput(it)
@@ -94,7 +92,7 @@ fun RegisterView(
 
             Spacer(modifier = Modifier.padding(5.dp))
 
-            GeneralOutlinedTextField(
+            AuthenticationOutlinedTextField(
                 inputValue = authenticationViewModel.usernameInput,
                 onInputValueChange = {
                     authenticationViewModel.changeUsernameInput(it)

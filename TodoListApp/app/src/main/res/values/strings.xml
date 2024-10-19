@@ -14,4 +14,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="emailText">Email</string>
     <string name="today_tasks_text">Today\'s Tasks</string>
+    <string name="title_text">Title</string>
+    <string name="description_text">Description</string>
+    <string name="due_date_text">Due Date</string>
 </resources>

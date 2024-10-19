@@ -2,6 +2,7 @@ package com.example.todolistapp.views
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -17,8 +20,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -26,19 +31,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todolistapp.R
 import com.example.todolistapp.enums.PrioritiesEnum
+import com.example.todolistapp.viewModels.HomeViewModel
 import com.example.todolistapp.views.templates.TodoListCardTemplate
 
 @Composable
 fun HomeView(
     modifier: Modifier = Modifier,
-    onAddButtonClicked: () -> Unit
+    onAddButtonClicked: () -> Unit,
+    homeViewModel: HomeViewModel = viewModel()
 ) {
+    val todoList = homeViewModel.todoModel.collectAsState()
+
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .background(Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -76,8 +84,8 @@ fun HomeView(
                     modifier = Modifier
                         .padding(start = 8.dp, bottom = 4.dp)
                         .fillMaxWidth(),
-                    
-                ) {
+
+                    ) {
                     Text(
                         text = stringResource(R.string.today_tasks_text),
                         fontSize = 27.sp,
@@ -101,51 +109,26 @@ fun HomeView(
                     }
                 }
 
-//                LazyColumn(
-//                    flingBehavior = ScrollableDefaults.flingBehavior()
-//                ) {
-//
-//                }
-
-                TodoListCardTemplate(
-                    title = "Do the mathematics homework",
-                    priority = PrioritiesEnum.High,
-                    dueDate = "30 September 2024",
-                    status = "Finished",
+                LazyColumn(
+                    flingBehavior = ScrollableDefaults.flingBehavior(),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp)
-                )
+                        .padding(vertical = 8.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
+                    items(todoList.value) { todo ->
+                        TodoListCardTemplate(
+                            title = todo.title,
+                            priority = todo.priority,
+                            dueDate = todo.dueDate,
+                            status = todo.status,
+                            priorityColor = homeViewModel.changePriorityTextBackgroundColor(todo.priority),
+                            modifier = Modifier
+                                .padding(bottom = 12.dp)
+                        )
+                    }
+                }
 
-                TodoListCardTemplate(
-                    title = "Do the mathematics homework right now what are you doing?",
-                    priority = PrioritiesEnum.Medium,
-                    dueDate = "30 September 2024",
-                    status = "Finished",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp)
-                )
 
-                TodoListCardTemplate(
-                    title = "Do the mathematics homework",
-                    priority = PrioritiesEnum.Low,
-                    dueDate = "30 September 2024",
-                    status = "Finished",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp)
-                )
-
-                TodoListCardTemplate(
-                    title = "Do the mathematics homework",
-                    priority = PrioritiesEnum.Low,
-                    dueDate = "30 September 2024",
-                    status = "Finished",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp)
-                )
             }
         }
     }
@@ -160,6 +143,9 @@ fun HomeViewPreview() {
     HomeView(
         onAddButtonClicked = {
 
-        }
+        },
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     )
 }

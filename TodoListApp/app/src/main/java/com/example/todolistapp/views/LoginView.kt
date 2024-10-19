@@ -31,7 +31,7 @@ import com.example.todolistapp.ui.theme.TodoListAppTheme
 import com.example.todolistapp.viewModels.AuthenticationViewModel
 import com.example.todolistapp.views.templates.AuthenticationButton
 import com.example.todolistapp.views.templates.AuthenticationQuestion
-import com.example.todolistapp.views.templates.GeneralOutlinedTextField
+import com.example.todolistapp.views.templates.AuthenticationOutlinedTextField
 import com.example.todolistapp.views.templates.PasswordOutlinedTextField
 
 @Composable
@@ -68,7 +68,7 @@ fun LoginView(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            GeneralOutlinedTextField(
+            AuthenticationOutlinedTextField(
                 inputValue = authenticationViewModel.emailInput,
                 onInputValueChange = {
                     authenticationViewModel.changeEmailInput(it)

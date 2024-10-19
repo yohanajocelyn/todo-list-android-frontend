@@ -1,12 +1,14 @@
 package com.example.todolistapp.views
 
 import android.graphics.pdf.PdfDocument.Page
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -77,12 +79,15 @@ fun TodoListApp(
                             inclusive = false
                         }
                     }
-                }
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
             )
         }
 
         composable(route = PagesEnum.CreateTodo.name) {
-            CreateTodoListView()
+            TodoListFormView()
         }
     }
 }

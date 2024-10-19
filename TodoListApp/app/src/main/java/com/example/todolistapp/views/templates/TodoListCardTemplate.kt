@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,18 +39,23 @@ fun TodoListCardTemplate(
     dueDate: String,
     status: String,
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = viewModel()
+    priorityColor: Color,
 ) {
     Card(
         onClick = { /*TODO*/ },
         modifier = modifier,
-        colors = CardDefaults.cardColors(Color.White)
+        colors = CardDefaults.cardColors(Color.White),
     ) {
         Row(
             modifier = Modifier
-                .padding(15.dp)
+                .fillMaxWidth()
+                .padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column() {
+            Column(
+                modifier = Modifier
+                    .weight(8f)
+            ) {
                 Text(
                     text = title,
                     fontSize = 19.sp,
@@ -60,21 +66,19 @@ fun TodoListCardTemplate(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .padding(top = 16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box(
                             modifier = Modifier
                                 .size(16.dp)
                                 .clip(RoundedCornerShape(100.dp))
-                                .background(homeViewModel.changePriorityTextBackgroundColor(priority))
+                                .background(priorityColor)
                         )
 
                         Text(
-                            text = priority.name,
+                            text = priority.name[0].toString(),
                             fontSize = 13.sp,
                             modifier = Modifier
                                 .padding(start = 4.dp),
@@ -83,8 +87,10 @@ fun TodoListCardTemplate(
                     }
 
                     // kasi icon jam
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_time),
@@ -102,8 +108,8 @@ fun TodoListCardTemplate(
                         )
                     }
 
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_task),
@@ -122,6 +128,15 @@ fun TodoListCardTemplate(
                     }
                 }
             }
+
+            Image(
+                painter = painterResource(id = R.drawable.ic_arrow_right),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(15.dp)
+                    .weight(0.5f)
+
+            )
         }
     }
 }
@@ -139,6 +154,7 @@ fun TodoListCardTemplatePreview() {
         dueDate = "20 September 2022",
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        priorityColor = Color.Red
     )
 }
