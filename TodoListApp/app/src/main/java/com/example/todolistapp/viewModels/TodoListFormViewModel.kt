@@ -1,6 +1,8 @@
 package com.example.todolistapp.viewModels
 
-import androidx.compose.material3.DatePickerState
+import android.app.DatePickerDialog
+import android.content.Context
+import android.widget.DatePicker
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,6 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Calendar
+import java.util.Date
 
 class TodoListFormViewModel: ViewModel() {
     private val _todoListFormUIState = MutableStateFlow(TodoListFormUIState())
@@ -50,10 +54,6 @@ class TodoListFormViewModel: ViewModel() {
         priorityInput = priority
     }
 
-    fun changeDueDateInput(dueDate: String) {
-        dueDateInput = dueDate
-    }
-
     fun changeStatusExpandedValue(
         expanded: Boolean
     ) {
@@ -88,5 +88,30 @@ class TodoListFormViewModel: ViewModel() {
                 priorityDropdownExpandedValue = false
             )
         }
+    }
+
+    fun showDatePickerDialog(datePickerDialog: DatePickerDialog) {
+        datePickerDialog.show()
+    }
+
+    fun initDatePickerDialog(context: Context): DatePickerDialog {
+        // Initializing a Calendar
+        val datePickerCalendar = Calendar.getInstance()
+
+        // Fetching current year, month and day
+        val calYear = datePickerCalendar.get(Calendar.YEAR)
+        val calMonth = datePickerCalendar.get(Calendar.MONTH)
+        val calDay = datePickerCalendar.get(Calendar.DAY_OF_MONTH)
+
+        datePickerCalendar.time = Date()
+
+        val datePickerDialog = DatePickerDialog(
+            context,
+            { _: DatePicker, calYear: Int, calMonth: Int, calDay: Int ->
+                dueDateInput = "$calDay/${calMonth + 1}/$calYear"
+            }, calYear, calMonth, calDay
+        )
+
+        return datePickerDialog
     }
 }

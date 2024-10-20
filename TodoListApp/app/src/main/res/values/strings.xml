@@ -17,4 +17,7 @@
     <string name="title_text">Title</string>
     <string name="description_text">Description</string>
     <string name="due_date_text">Due Date</string>
+    <string name="pick_date_text">Pick Date</string>
+    <string name="cancel_text">Cancel</string>
+    <string name="save_text">Save</string>
 </resources>

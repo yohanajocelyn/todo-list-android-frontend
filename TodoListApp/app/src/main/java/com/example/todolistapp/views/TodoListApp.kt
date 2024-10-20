@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -22,6 +23,7 @@ fun TodoListApp(
     navController: NavHostController = rememberNavController()
 ) {
     val focusManager = LocalFocusManager.current
+    val localContext = LocalContext.current
 
     NavHost(navController = navController, startDestination = PagesEnum.Login.name) {
         composable(route = PagesEnum.Login.name) {
@@ -87,7 +89,18 @@ fun TodoListApp(
         }
 
         composable(route = PagesEnum.CreateTodo.name) {
-            TodoListFormView()
+            TodoListFormView(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                context = localContext,
+                onCancelButtonClick = {
+                    // TODO: Add on cancel button click event handler
+                },
+                onSaveButtonClick = {
+                    // TODO: Add on save button click event handler
+                }
+            )
         }
     }
 }

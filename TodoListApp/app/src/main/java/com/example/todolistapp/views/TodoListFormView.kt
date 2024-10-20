@@ -1,5 +1,6 @@
 package com.example.todolistapp.views
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,9 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todolistapp.R
 import com.example.todolistapp.viewModels.TodoListFormViewModel
@@ -27,7 +31,10 @@ import com.example.todolistapp.views.templates.TodoListOutlinedTextField
 @Composable
 fun TodoListFormView(
     todoListFormViewModel: TodoListFormViewModel = viewModel(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    context: Context,
+    onCancelButtonClick: () -> Unit,
+    onSaveButtonClick: () -> Unit
 ) {
     val todoListFormUIState = todoListFormViewModel.todoListFormUIState.collectAsState()
 
@@ -35,7 +42,16 @@ fun TodoListFormView(
         modifier = modifier,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
+
         Column {
+            Text(
+                text = "Todo List Form",
+                fontSize = 35.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .padding(bottom = 15.dp)
+            )
+
             TodoListOutlinedTextField(
                 inputValue = todoListFormViewModel.titleInput,
                 onValueChange = {
@@ -108,24 +124,33 @@ fun TodoListFormView(
             }
 
             // TODO: Date Picker
+            TodoListDatePicker(
+                datePickerValue = todoListFormViewModel.dueDateInput,
+                showCalendarDialog = {
+                    todoListFormViewModel.showDatePickerDialog(todoListFormViewModel.initDatePickerDialog(context))
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+            )
         }
 
         Column {
             Button(
-                onClick = { /*TODO*/ },
+                onClick = onCancelButtonClick,
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(Color.Gray)
             ) {
-                Text(text = "Cancel")
+                Text(text = stringResource(R.string.cancel_text))
             }
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = onSaveButtonClick,
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(text = "Save")
+                Text(text = stringResource(R.string.save_text))
             }
         }
     }
@@ -140,6 +165,9 @@ fun CreateTodoListViewPreview() {
     TodoListFormView(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
+            .padding(8.dp),
+        context = LocalContext.current,
+        onCancelButtonClick = {},
+        onSaveButtonClick = {}
     )
 }
