@@ -41,7 +41,8 @@ import com.example.todolistapp.views.templates.TodoListCardTemplate
 fun HomeView(
     modifier: Modifier = Modifier,
     onAddButtonClicked: () -> Unit,
-    homeViewModel: HomeViewModel = viewModel()
+    homeViewModel: HomeViewModel,
+    onCardButtonClick: () -> Unit
 ) {
     val todoList = homeViewModel.todoModel.collectAsState()
 
@@ -123,12 +124,11 @@ fun HomeView(
                             status = todo.status,
                             priorityColor = homeViewModel.changePriorityTextBackgroundColor(todo.priority),
                             modifier = Modifier
-                                .padding(bottom = 12.dp)
+                                .padding(bottom = 12.dp),
+                            onCardClick = onCardButtonClick
                         )
                     }
                 }
-
-
             }
         }
     }
@@ -146,6 +146,8 @@ fun HomeViewPreview() {
         },
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(Color.White),
+        homeViewModel = viewModel(),
+        onCardButtonClick = {}
     )
 }

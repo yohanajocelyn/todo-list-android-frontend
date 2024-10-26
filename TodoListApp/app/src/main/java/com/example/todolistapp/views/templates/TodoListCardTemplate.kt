@@ -33,9 +33,10 @@ fun TodoListCardTemplate(
     status: String,
     modifier: Modifier = Modifier,
     priorityColor: Color,
+    onCardClick: () -> Unit
 ) {
     Card(
-        onClick = { /*TODO*/ },
+        onClick = onCardClick,
         modifier = modifier,
         colors = CardDefaults.cardColors(Color.White),
     ) {
@@ -148,6 +149,7 @@ fun TodoListCardTemplatePreview() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        priorityColor = Color.Red
+        priorityColor = Color.Red,
+        onCardClick = {}
     )
 }

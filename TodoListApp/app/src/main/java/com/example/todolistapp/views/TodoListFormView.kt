@@ -56,6 +56,7 @@ fun TodoListFormView(
                 inputValue = todoListFormViewModel.titleInput,
                 onValueChange = {
                     todoListFormViewModel.changeTitleInput(it)
+                    todoListFormViewModel.checkNullFormValues()
                 },
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -69,6 +70,7 @@ fun TodoListFormView(
                 inputValue = todoListFormViewModel.descriptionInput,
                 onValueChange = {
                     todoListFormViewModel.changeDescriptionInput(it)
+                    todoListFormViewModel.checkNullFormValues()
                 },
                 labelText = stringResource(R.string.description_text),
                 placeholderText = stringResource(R.string.description_text),
@@ -92,6 +94,7 @@ fun TodoListFormView(
                     dropdownItems = todoListFormUIState.value.statusDropdownItems,
                     onDropdownItemClick = {
                         todoListFormViewModel.changeStatusInput(it)
+                        todoListFormViewModel.checkNullFormValues()
                     },
                     onDropdownMenuBoxExpandedChange = {
                         todoListFormViewModel.changeStatusExpandedValue(it)
@@ -111,6 +114,7 @@ fun TodoListFormView(
                     dropdownItems = todoListFormUIState.value.priorityDropdownItems,
                     onDropdownItemClick = {
                         todoListFormViewModel.changePriorityInput(it)
+                        todoListFormViewModel.checkNullFormValues()
                     },
                     onDropdownMenuBoxExpandedChange = {
                         todoListFormViewModel.changePriorityExpandedValue(it)
@@ -148,7 +152,9 @@ fun TodoListFormView(
             Button(
                 onClick = onSaveButtonClick,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                enabled = todoListFormUIState.value.saveButtonEnabled,
+                colors = ButtonDefaults.buttonColors(todoListFormViewModel.changeSaveButtonColor())
             ) {
                 Text(text = stringResource(R.string.save_text))
             }
@@ -165,7 +171,8 @@ fun CreateTodoListViewPreview() {
     TodoListFormView(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp),
+            .padding(8.dp)
+            .padding(top = 8.dp),
         context = LocalContext.current,
         onCancelButtonClick = {},
         onSaveButtonClick = {}

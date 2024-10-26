@@ -6,7 +6,9 @@ import android.widget.DatePicker
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavHostController
 import com.example.todolistapp.uiStates.TodoListFormUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import java.util.Calendar
 import java.util.Date
 
-class TodoListFormViewModel: ViewModel() {
+class TodoListFormViewModel : ViewModel() {
     private val _todoListFormUIState = MutableStateFlow(TodoListFormUIState())
 
     val todoListFormUIState: StateFlow<TodoListFormUIState>
@@ -109,9 +111,34 @@ class TodoListFormViewModel: ViewModel() {
             context,
             { _: DatePicker, calYear: Int, calMonth: Int, calDay: Int ->
                 dueDateInput = "$calDay/${calMonth + 1}/$calYear"
+                checkNullFormValues()
             }, calYear, calMonth, calDay
         )
 
         return datePickerDialog
+    }
+
+    fun checkNullFormValues() {
+        if (titleInput.isNotEmpty() && descriptionInput.isNotEmpty() && statusInput.isNotEmpty() && priorityInput.isNotEmpty() && dueDateInput.isNotEmpty()) {
+            _todoListFormUIState.update { currentState ->
+                currentState.copy(
+                    saveButtonEnabled = true
+                )
+            }
+        } else {
+            _todoListFormUIState.update { currentState ->
+                currentState.copy(
+                    saveButtonEnabled = false
+                )
+            }
+        }
+    }
+
+    fun changeSaveButtonColor(): Color {
+        if (_todoListFormUIState.value.saveButtonEnabled) {
+            return Color.Blue
+        }
+
+        return Color.LightGray
     }
 }

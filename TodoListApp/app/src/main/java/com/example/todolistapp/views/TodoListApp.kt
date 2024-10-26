@@ -12,15 +12,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.enums.PagesEnum
+import com.example.todolistapp.viewModels.AuthenticationViewModel
+import com.example.todolistapp.viewModels.HomeViewModel
+import com.example.todolistapp.viewModels.TodoListFormViewModel
 
 @Composable
 fun TodoListApp(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    homeViewModel: HomeViewModel = viewModel(),
+    todoListFormViewModel: TodoListFormViewModel = viewModel()
 ) {
     val focusManager = LocalFocusManager.current
     val localContext = LocalContext.current
@@ -45,14 +51,15 @@ fun TodoListApp(
                             inclusive = true
                         }
                     }
-                }
+                },
+                authenticationViewModel = viewModel()
             )
         }
 
         composable(route = PagesEnum.Register.name) {
             RegisterView(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(20.dp),
                 onSignInTextClicked = {
                     navController.navigate(PagesEnum.Login.name) {
@@ -68,7 +75,8 @@ fun TodoListApp(
                             inclusive = true
                         }
                     }
-                }
+                },
+                authenticationViewModel = viewModel()
             )
         }
 
@@ -84,7 +92,15 @@ fun TodoListApp(
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White)
+                    .background(Color.White),
+                homeViewModel = homeViewModel,
+                onCardButtonClick = {
+                    navController.navigate(PagesEnum.TodoDetail.name) {
+                        popUpTo(PagesEnum.Home.name) {
+                            inclusive = false
+                        }
+                    }
+                }
             )
         }
 
@@ -95,10 +111,37 @@ fun TodoListApp(
                     .padding(16.dp),
                 context = localContext,
                 onCancelButtonClick = {
-                    // TODO: Add on cancel button click event handler
+                    navController.popBackStack()
                 },
                 onSaveButtonClick = {
                     // TODO: Add on save button click event handler
+                    navController.navigate(PagesEnum.Home.name) {
+                        popUpTo(PagesEnum.CreateTodo.name) {
+                            inclusive = true
+                        }
+                    }
+                },
+                todoListFormViewModel =  todoListFormViewModel
+            )
+        }
+
+        composable(route = PagesEnum.TodoDetail.name) {
+            TodoListDetailView(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                onBackButtonClick = {
+                    navController.popBackStack()
+                },
+                onEditButtonClick = {
+                    navController.navigate(PagesEnum.CreateTodo.name) {
+                        popUpTo(PagesEnum.TodoDetail.name) {
+                            inclusive = false
+                        }
+                    }
+                },
+                onDeleteButtonClick = {
+
                 }
             )
         }

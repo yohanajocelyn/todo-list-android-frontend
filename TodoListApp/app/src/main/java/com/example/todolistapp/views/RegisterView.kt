@@ -36,7 +36,7 @@ import com.example.todolistapp.views.templates.PasswordOutlinedTextField
 
 @Composable
 fun RegisterView(
-    authenticationViewModel: AuthenticationViewModel = viewModel(),
+    authenticationViewModel: AuthenticationViewModel,
     onSignInTextClicked: () -> Unit,
     modifier: Modifier = Modifier,
     focusManager: FocusManager,
@@ -203,7 +203,8 @@ fun RegisterViewPreview() {
             focusManager = LocalFocusManager.current,
             onSignUpButtonClicked = {
 
-            }
+            },
+            authenticationViewModel = viewModel()
         )
     }
 }

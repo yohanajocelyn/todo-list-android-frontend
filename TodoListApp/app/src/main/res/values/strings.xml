@@ -20,4 +20,8 @@
     <string name="pick_date_text">Pick Date</string>
     <string name="cancel_text">Cancel</string>
     <string name="save_text">Save</string>
+    <string name="status_detail_text">"Status: "</string>
+    <string name="priority_detail_text">"Priority: "</string>
+    <string name="due_date_detail_text">"Due Date: "</string>
+    <string name="description_detail_text">"Description: "</string>
 </resources>
