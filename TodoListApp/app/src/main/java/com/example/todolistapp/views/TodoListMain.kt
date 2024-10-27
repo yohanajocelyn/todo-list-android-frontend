@@ -1,10 +1,7 @@
 package com.example.todolistapp.views
 
-import android.graphics.pdf.PdfDocument.Page
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,7 +23,8 @@ import com.example.todolistapp.viewModels.TodoListFormViewModel
 fun TodoListApp(
     navController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = viewModel(),
-    todoListFormViewModel: TodoListFormViewModel = viewModel()
+    todoListFormViewModel: TodoListFormViewModel = viewModel(),
+    authenticationViewModel: AuthenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory)
 ) {
     val focusManager = LocalFocusManager.current
     val localContext = LocalContext.current
@@ -38,6 +36,7 @@ fun TodoListApp(
                     .fillMaxSize()
                     .padding(20.dp),
                 onSignUpTextClicked = {
+                    authenticationViewModel.resetViewModel()
                     navController.navigate(PagesEnum.Register.name) {
                         popUpTo(PagesEnum.Login.name) {
                             inclusive = true
@@ -52,7 +51,7 @@ fun TodoListApp(
                         }
                     }
                 },
-                authenticationViewModel = viewModel()
+                authenticationViewModel = authenticationViewModel
             )
         }
 
@@ -62,6 +61,7 @@ fun TodoListApp(
                     .fillMaxSize()
                     .padding(20.dp),
                 onSignInTextClicked = {
+                    authenticationViewModel.resetViewModel()
                     navController.navigate(PagesEnum.Login.name) {
                         popUpTo(PagesEnum.Register.name) {
                             inclusive = true
@@ -70,13 +70,9 @@ fun TodoListApp(
                 },
                 focusManager = focusManager,
                 onSignUpButtonClicked = {
-                    navController.navigate(PagesEnum.Home.name) {
-                        popUpTo(PagesEnum.Register.name) {
-                            inclusive = true
-                        }
-                    }
+                    authenticationViewModel.registerUser(navController)
                 },
-                authenticationViewModel = viewModel()
+                authenticationViewModel = authenticationViewModel
             )
         }
 
