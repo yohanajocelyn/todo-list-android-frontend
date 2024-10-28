@@ -138,7 +138,7 @@ fun LoginView(
             questionText = stringResource(id = R.string.don_t_have_an_account_yet_text),
             actionText = stringResource(id = R.string.sign_up_text),
             onActionTextClicked = {
-
+                authenticationViewModel.resetViewModel()
                 navController.navigate(PagesEnum.Register.name) {
                     popUpTo(PagesEnum.Login.name) {
                         inclusive = true

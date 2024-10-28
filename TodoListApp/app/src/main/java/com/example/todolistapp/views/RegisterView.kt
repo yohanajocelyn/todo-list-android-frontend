@@ -188,6 +188,7 @@ fun RegisterView(
             questionText = stringResource(id = R.string.already_have_an_account_text),
             actionText = stringResource(id = R.string.sign_in_text),
             onActionTextClicked = {
+                authenticationViewModel.resetViewModel()
                 navController.navigate(PagesEnum.Login.name) {
                     popUpTo(PagesEnum.Register.name) {
                         inclusive = true

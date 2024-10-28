@@ -128,4 +128,22 @@ class AuthenticationViewModel : ViewModel() {
 
         return Color.LightGray
     }
+
+    fun resetViewModel() {
+        changeEmailInput("")
+        changePasswordInput("")
+        changeUsernameInput("")
+        changeConfirmPasswordInput("")
+        _authenticationUIState.update { currentState ->
+            currentState.copy(
+                showConfirmPassword = false,
+                showPassword = false,
+                passwordVisibility = PasswordVisualTransformation(),
+                confirmPasswordVisibility = PasswordVisualTransformation(),
+                passwordVisibilityIcon = R.drawable.ic_password_visible,
+                confirmPasswordVisibilityIcon = R.drawable.ic_password_visible,
+                buttonEnabled = false
+            )
+        }
+    }
 }
