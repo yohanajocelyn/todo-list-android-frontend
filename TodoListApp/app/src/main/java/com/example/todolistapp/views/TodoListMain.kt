@@ -26,7 +26,6 @@ fun TodoListApp(
     todoListFormViewModel: TodoListFormViewModel = viewModel(),
     authenticationViewModel: AuthenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory)
 ) {
-    val focusManager = LocalFocusManager.current
     val localContext = LocalContext.current
 
     NavHost(navController = navController, startDestination = PagesEnum.Login.name) {
@@ -35,23 +34,8 @@ fun TodoListApp(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp),
-                onSignUpTextClicked = {
-                    authenticationViewModel.resetViewModel()
-                    navController.navigate(PagesEnum.Register.name) {
-                        popUpTo(PagesEnum.Login.name) {
-                            inclusive = true
-                        }
-                    }
-                },
-                focusManager = focusManager,
-                onSignInButtonClicked = {
-                    navController.navigate(PagesEnum.Home.name) {
-                        popUpTo(PagesEnum.Login.name) {
-                            inclusive = true
-                        }
-                    }
-                },
-                authenticationViewModel = authenticationViewModel
+                authenticationViewModel = authenticationViewModel,
+                navController = navController
             )
         }
 
@@ -60,43 +44,18 @@ fun TodoListApp(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp),
-                onSignInTextClicked = {
-                    authenticationViewModel.resetViewModel()
-                    navController.navigate(PagesEnum.Login.name) {
-                        popUpTo(PagesEnum.Register.name) {
-                            inclusive = true
-                        }
-                    }
-                },
-                focusManager = focusManager,
-                onSignUpButtonClicked = {
-                    authenticationViewModel.registerUser(navController)
-                },
-                authenticationViewModel = authenticationViewModel
+                authenticationViewModel = authenticationViewModel,
+                navController = navController
             )
         }
 
         composable(route = PagesEnum.Home.name) {
             HomeView(
-                onAddButtonClicked = {
-                    // TODO: Buat kelas CreateTodoView
-                    navController.navigate(PagesEnum.CreateTodo.name) {
-                        popUpTo(PagesEnum.Home.name) {
-                            inclusive = false
-                        }
-                    }
-                },
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.White),
                 homeViewModel = homeViewModel,
-                onCardButtonClick = {
-                    navController.navigate(PagesEnum.TodoDetail.name) {
-                        popUpTo(PagesEnum.Home.name) {
-                            inclusive = false
-                        }
-                    }
-                }
+                navController = navController
             )
         }
 
@@ -106,18 +65,8 @@ fun TodoListApp(
                     .fillMaxSize()
                     .padding(16.dp),
                 context = localContext,
-                onCancelButtonClick = {
-                    navController.popBackStack()
-                },
-                onSaveButtonClick = {
-                    // TODO: Add on save button click event handler
-                    navController.navigate(PagesEnum.Home.name) {
-                        popUpTo(PagesEnum.CreateTodo.name) {
-                            inclusive = true
-                        }
-                    }
-                },
-                todoListFormViewModel =  todoListFormViewModel
+                todoListFormViewModel =  todoListFormViewModel,
+                navController = navController
             )
         }
 
@@ -126,19 +75,7 @@ fun TodoListApp(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
-                onBackButtonClick = {
-                    navController.popBackStack()
-                },
-                onEditButtonClick = {
-                    navController.navigate(PagesEnum.CreateTodo.name) {
-                        popUpTo(PagesEnum.TodoDetail.name) {
-                            inclusive = false
-                        }
-                    }
-                },
-                onDeleteButtonClick = {
-
-                }
+                navController = navController
             )
         }
     }

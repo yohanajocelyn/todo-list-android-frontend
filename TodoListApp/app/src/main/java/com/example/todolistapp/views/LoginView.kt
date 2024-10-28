@@ -26,7 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
+import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.ui.theme.TodoListAppTheme
 import com.example.todolistapp.viewModels.AuthenticationViewModel
 import com.example.todolistapp.views.templates.AuthenticationButton
@@ -37,13 +40,13 @@ import com.example.todolistapp.views.templates.PasswordOutlinedTextField
 @Composable
 fun LoginView(
     authenticationViewModel: AuthenticationViewModel,
-    onSignUpTextClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    focusManager: FocusManager,
-    onSignInButtonClicked: () -> Unit
+    navController: NavHostController
 ) {
     val loginUIState by authenticationViewModel.authenticationUIState.collectAsState()
     val loginButtonEnabled = authenticationViewModel.checkLoginForm()
+
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = modifier,
@@ -115,7 +118,13 @@ fun LoginView(
 
             AuthenticationButton(
                 buttonText = stringResource(id = R.string.loginText),
-                onButtonClick = onSignInButtonClicked,
+                onButtonClick = {
+                    navController.navigate(PagesEnum.Home.name) {
+                        popUpTo(PagesEnum.Login.name) {
+                            inclusive = true
+                        }
+                    }
+                },
                 buttonModifier = Modifier
                     .padding(top = 30.dp),
                 textModifier = Modifier
@@ -128,7 +137,14 @@ fun LoginView(
         AuthenticationQuestion(
             questionText = stringResource(id = R.string.don_t_have_an_account_yet_text),
             actionText = stringResource(id = R.string.sign_up_text),
-            onActionTextClicked = onSignUpTextClicked,
+            onActionTextClicked = {
+                authenticationViewModel.resetViewModel()
+                navController.navigate(PagesEnum.Register.name) {
+                    popUpTo(PagesEnum.Login.name) {
+                        inclusive = true
+                    }
+                }
+            },
             rowModifier = Modifier
                 .align(Alignment.CenterHorizontally),
         )
@@ -146,14 +162,8 @@ fun LoginViewPreview() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp),
-            onSignUpTextClicked = {
-
-            },
-            focusManager = LocalFocusManager.current,
-            onSignInButtonClicked = {
-
-            },
-            authenticationViewModel = viewModel()
+            authenticationViewModel = viewModel(),
+            navController = rememberNavController()
         )
     }
 }

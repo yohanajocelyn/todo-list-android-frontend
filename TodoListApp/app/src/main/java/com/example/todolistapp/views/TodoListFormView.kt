@@ -22,7 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
+import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.viewModels.TodoListFormViewModel
 import com.example.todolistapp.views.templates.TodoListDatePicker
 import com.example.todolistapp.views.templates.TodoListDropdown
@@ -33,8 +36,7 @@ fun TodoListFormView(
     todoListFormViewModel: TodoListFormViewModel = viewModel(),
     modifier: Modifier = Modifier,
     context: Context,
-    onCancelButtonClick: () -> Unit,
-    onSaveButtonClick: () -> Unit
+    navController: NavHostController
 ) {
     val todoListFormUIState = todoListFormViewModel.todoListFormUIState.collectAsState()
 
@@ -141,7 +143,9 @@ fun TodoListFormView(
 
         Column {
             Button(
-                onClick = onCancelButtonClick,
+                onClick = {
+                    navController.popBackStack()
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(Color.Gray)
@@ -150,7 +154,14 @@ fun TodoListFormView(
             }
 
             Button(
-                onClick = onSaveButtonClick,
+                onClick = {
+                    // TODO: Add on save button click event handler
+                    navController.navigate(PagesEnum.Home.name) {
+                        popUpTo(PagesEnum.CreateTodo.name) {
+                            inclusive = true
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth(),
                 enabled = todoListFormUIState.value.saveButtonEnabled,
@@ -174,7 +185,6 @@ fun CreateTodoListViewPreview() {
             .padding(8.dp)
             .padding(top = 8.dp),
         context = LocalContext.current,
-        onCancelButtonClick = {},
-        onSaveButtonClick = {}
+        navController = rememberNavController()
     )
 }
