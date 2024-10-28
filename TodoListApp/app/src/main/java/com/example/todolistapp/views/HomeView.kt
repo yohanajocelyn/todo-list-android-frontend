@@ -32,7 +32,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
+import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.enums.PrioritiesEnum
 import com.example.todolistapp.viewModels.HomeViewModel
 import com.example.todolistapp.views.templates.TodoListCardTemplate
@@ -40,9 +43,8 @@ import com.example.todolistapp.views.templates.TodoListCardTemplate
 @Composable
 fun HomeView(
     modifier: Modifier = Modifier,
-    onAddButtonClicked: () -> Unit,
     homeViewModel: HomeViewModel,
-    onCardButtonClick: () -> Unit
+    navController: NavHostController
 ) {
     val todoList = homeViewModel.todoModel.collectAsState()
 
@@ -95,7 +97,13 @@ fun HomeView(
                     )
 
                     Button(
-                        onClick = onAddButtonClicked,
+                        onClick = {
+                            navController.navigate(PagesEnum.CreateTodo.name) {
+                                popUpTo(PagesEnum.Home.name) {
+                                    inclusive = false
+                                }
+                            }
+                        },
                         contentPadding = PaddingValues(0.dp),
                         colors = ButtonDefaults.buttonColors(Color.White),
                         modifier = Modifier
@@ -125,7 +133,13 @@ fun HomeView(
                             priorityColor = homeViewModel.changePriorityTextBackgroundColor(todo.priority),
                             modifier = Modifier
                                 .padding(bottom = 12.dp),
-                            onCardClick = onCardButtonClick
+                            onCardClick = {
+                                navController.navigate(PagesEnum.TodoDetail.name) {
+                                    popUpTo(PagesEnum.Home.name) {
+                                        inclusive = false
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -141,13 +155,10 @@ fun HomeView(
 @Composable
 fun HomeViewPreview() {
     HomeView(
-        onAddButtonClicked = {
-
-        },
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
         homeViewModel = viewModel(),
-        onCardButtonClick = {}
+        navController = rememberNavController()
     )
 }

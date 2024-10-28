@@ -27,14 +27,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
+import com.example.todolistapp.enums.PagesEnum
 
 @Composable
 fun TodoListDetailView (
     modifier: Modifier = Modifier,
-    onBackButtonClick: () -> Unit,
-    onEditButtonClick: () -> Unit,
-    onDeleteButtonClick: () -> Unit
+    navController: NavHostController
 ) {
     Column(
         modifier = modifier
@@ -45,7 +46,9 @@ fun TodoListDetailView (
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = onBackButtonClick,
+                onClick = {
+                    navController.popBackStack()
+                },
                 contentPadding = PaddingValues(0.dp),
                 modifier = Modifier
                     .size(40.dp),
@@ -62,7 +65,13 @@ fun TodoListDetailView (
 
             Row {
                 Button(
-                    onClick = onEditButtonClick,
+                    onClick = {
+                        navController.navigate(PagesEnum.CreateTodo.name) {
+                            popUpTo(PagesEnum.TodoDetail.name) {
+                                inclusive = false
+                            }
+                        }
+                    },
                     contentPadding = PaddingValues(0.dp),
                     modifier = Modifier
                         .size(40.dp),
@@ -80,7 +89,9 @@ fun TodoListDetailView (
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
 
                 Button(
-                    onClick =   onDeleteButtonClick,
+                    onClick = {
+
+                    },
                     contentPadding = PaddingValues(0.dp),
                     modifier = Modifier
                         .size(40.dp),
@@ -205,8 +216,6 @@ fun TodoListDetailViewPreview() {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        onDeleteButtonClick = {},
-        onBackButtonClick = {},
-        onEditButtonClick = {}
+        navController = rememberNavController()
     )
 }
