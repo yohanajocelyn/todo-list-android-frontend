@@ -176,19 +176,19 @@ class AuthenticationViewModel(
                             )
 
                             Log.d("error-data", "ERROR DATA: ${errorMessage}")
-                            dataStatus = UserDataStatusUIState.Failed
+                            dataStatus = UserDataStatusUIState.Failed(errorMessage.errors)
                         }
                     }
 
                     override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                         Log.d("error-data", "ERROR DATA: ${t.localizedMessage}")
-                        dataStatus = UserDataStatusUIState.Failed
+                        dataStatus = UserDataStatusUIState.Failed(t.localizedMessage)
                     }
 
                 })
             } catch (error: IOException) {
-                dataStatus = UserDataStatusUIState.Failed
-                Log.d("register-error", "REGISTER ERROR: ${error.toString()}")
+                dataStatus = UserDataStatusUIState.Failed(error.localizedMessage)
+                Log.d("register-error", "REGISTER ERROR: ${error.localizedMessage}")
             }
         }
     }
@@ -217,18 +217,20 @@ class AuthenticationViewModel(
                             )
 
                             Log.d("error-data", "ERROR DATA: ${errorMessage}")
-                            dataStatus = UserDataStatusUIState.Failed
+                            dataStatus = UserDataStatusUIState.Failed(
+                                errorMessage.errors
+                            )
                         }
                     }
 
                     override fun onFailure(call: Call<UserResponse>, t: Throwable) {
-                        dataStatus = UserDataStatusUIState.Failed
+                        dataStatus = UserDataStatusUIState.Failed(t.localizedMessage)
                     }
 
                 })
             } catch (error: IOException) {
-                dataStatus = UserDataStatusUIState.Failed
-                Log.d("register-error", "REGISTER ERROR: ${error.toString()}")
+                dataStatus = UserDataStatusUIState.Failed(error.localizedMessage)
+                Log.d("register-error", "LOGIN ERROR: ${error.toString()}")
             }
         }
     }

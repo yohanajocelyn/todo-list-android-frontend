@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
@@ -169,18 +170,18 @@ fun RegisterView(
             AuthenticationButton(
                 buttonText = stringResource(id = R.string.registerText),
                 onButtonClick = {
-                    navController.navigate(PagesEnum.Home.name) {
-                        popUpTo(PagesEnum.Register.name) {
-                            inclusive = true
-                        }
-                    }
+                    authenticationViewModel.registerUser(navController)
                 },
                 buttonModifier = Modifier
                     .padding(top = 30.dp),
                 textModifier = Modifier
                     .padding(vertical = 5.dp, horizontal = 15.dp),
                 buttonEnabled = registerUIState.buttonEnabled,
-                buttonColor = authenticationViewModel.checkButtonEnabled(registerUIState.buttonEnabled)
+                buttonColor = authenticationViewModel.checkButtonEnabled(registerUIState.buttonEnabled),
+                userDataStatusUIState = authenticationViewModel.dataStatus,
+                loadingBarModifier = Modifier
+                    .padding(top = 30.dp)
+                    .size(40.dp)
             )
         }
 
@@ -212,7 +213,7 @@ fun RegisterViewPreview() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp),
-            authenticationViewModel = viewModel(),
+            authenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory),
             navController = rememberNavController()
         )
     }

@@ -3,6 +3,7 @@ package com.example.todolistapp.views.templates
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todolistapp.R
+import com.example.todolistapp.uiStates.UserDataStatusUIState
 
 @Composable
 fun AuthenticationOutlinedTextField(
@@ -122,21 +124,31 @@ fun AuthenticationButton(
     buttonModifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
     buttonEnabled: Boolean,
-    buttonColor: Color
+    buttonColor: Color,
+    userDataStatusUIState: UserDataStatusUIState,
+    loadingBarModifier: Modifier = Modifier
 ) {
-    Button(
-        onClick = onButtonClick,
-        modifier = buttonModifier,
-        colors = ButtonDefaults.buttonColors(buttonColor),
-        enabled = buttonEnabled
-    ) {
-        Text(
-            text = buttonText,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = textModifier
+    when(userDataStatusUIState) {
+        is UserDataStatusUIState.Loading -> CircleLoadingTemplate(
+            modifier = loadingBarModifier,
+            color = Color.Blue,
+            trackColor = Color.Transparent
         )
+        else -> Button(
+            onClick = onButtonClick,
+            modifier = buttonModifier,
+            colors = ButtonDefaults.buttonColors(buttonColor),
+            enabled = buttonEnabled
+        ) {
+            Text(
+                text = buttonText,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = textModifier
+            )
+        }
     }
+
 }
 
 @Composable
