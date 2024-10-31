@@ -5,7 +5,6 @@ import com.example.todolistapp.models.UserModel
 // exhaustive (covers all scenario possibilities) interface
 sealed interface UserDataStatusUIState {
     data class Success(val userModelData: UserModel): UserDataStatusUIState
-    data class Failed(val errorMessage: String): UserDataStatusUIState
     object Loading: UserDataStatusUIState
     object Start: UserDataStatusUIState
 }

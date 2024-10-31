@@ -1,5 +1,7 @@
 package com.example.todolistapp.views
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,18 +13,21 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.data.ContextCache
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,12 +47,19 @@ import com.example.todolistapp.views.templates.PasswordOutlinedTextField
 fun LoginView(
     authenticationViewModel: AuthenticationViewModel,
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    context: Context
 ) {
     val loginUIState by authenticationViewModel.authenticationUIState.collectAsState()
-    val loginButtonEnabled = authenticationViewModel.checkLoginForm()
 
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(loginUIState.errorMessage) {
+        if (loginUIState.errorMessage != null) {
+            Toast.makeText(context, loginUIState.errorMessage, Toast.LENGTH_SHORT).show()
+            authenticationViewModel.clearErrorMessage()
+        }
+    }
 
     Column(
         modifier = modifier,
@@ -164,7 +176,8 @@ fun LoginViewPreview() {
                 .fillMaxSize()
                 .padding(20.dp),
             authenticationViewModel = viewModel(),
-            navController = rememberNavController()
+            navController = rememberNavController(),
+            context = LocalContext.current
         )
     }
 }

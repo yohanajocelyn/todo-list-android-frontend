@@ -1,8 +1,16 @@
 package com.example.todolistapp
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.todolistapp.repositories.AuthenticationRepository
 import com.example.todolistapp.repositories.NetworkAuthenticationRepository
+import com.example.todolistapp.repositories.NetworkUserRepository
+import com.example.todolistapp.repositories.UserRepository
 import com.example.todolistapp.services.AuthenticationAPIService
+import com.example.todolistapp.services.UserAPIService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -13,9 +21,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 // You can create a subclass of the Application class and store a reference to the container.
 interface AppContainer {
     val authenticationRepository: AuthenticationRepository
+    val userRepository: UserRepository
 }
 
-class DefaultAppContainer: AppContainer {
+class DefaultAppContainer(
+    private val userDataStore: DataStore<Preferences>
+): AppContainer {
     // change it to local ip please
     private val baseUrl = "http://192.168.18.10:3000/"
 
@@ -26,9 +37,19 @@ class DefaultAppContainer: AppContainer {
         retrofit.create(AuthenticationAPIService::class.java)
     }
 
+    private val userRetrofitService: UserAPIService by lazy {
+        val retrofit = initRetrofit()
+
+        retrofit.create(UserAPIService::class.java)
+    }
+
     // Passing in the required objects is called dependency injection (DI). It is also known as inversion of control.
     override val authenticationRepository: AuthenticationRepository by lazy {
         NetworkAuthenticationRepository(authenticationRetrofitService)
+    }
+
+    override val userRepository: UserRepository by lazy {
+        NetworkUserRepository(userDataStore, userRetrofitService)
     }
 
     private fun initRetrofit(): Retrofit {

@@ -19,6 +19,8 @@ import com.example.todolistapp.TodoListApplication
 import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.models.UserResponse
 import com.example.todolistapp.repositories.AuthenticationRepository
+import com.example.todolistapp.repositories.NetworkUserRepository
+import com.example.todolistapp.repositories.UserRepository
 import com.example.todolistapp.uiStates.AuthenticationUIState
 import com.example.todolistapp.uiStates.UserDataStatusUIState
 import com.google.gson.Gson
@@ -33,7 +35,8 @@ import retrofit2.Response
 import java.io.IOException
 
 class AuthenticationViewModel(
-    private val authenticationRepository: AuthenticationRepository
+    private val authenticationRepository: AuthenticationRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val _authenticationUIState = MutableStateFlow(AuthenticationUIState())
 
@@ -161,6 +164,8 @@ class AuthenticationViewModel(
                         if (res.isSuccessful) {
                             Log.d("response-data", "RESPONSE DATA: ${res.body()}")
 
+                            saveUsernameToken(res.body()!!.data.token!!, res.body()!!.data.username)
+
                             dataStatus = UserDataStatusUIState.Success(res.body()!!.data)
 
                             navController.navigate(PagesEnum.Home.name) {
@@ -175,20 +180,24 @@ class AuthenticationViewModel(
                                 UserResponse::class.java
                             )
 
+                            displayErrorMessage(errorMessage.errors)
+
                             Log.d("error-data", "ERROR DATA: ${errorMessage}")
-                            dataStatus = UserDataStatusUIState.Failed(errorMessage.errors)
+                            dataStatus = UserDataStatusUIState.Start
                         }
                     }
 
                     override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                         Log.d("error-data", "ERROR DATA: ${t.localizedMessage}")
-                        dataStatus = UserDataStatusUIState.Failed(t.localizedMessage)
+                        dataStatus = UserDataStatusUIState.Start
+                        displayErrorMessage(t.localizedMessage)
                     }
 
                 })
             } catch (error: IOException) {
-                dataStatus = UserDataStatusUIState.Failed(error.localizedMessage)
+                dataStatus = UserDataStatusUIState.Start
                 Log.d("register-error", "REGISTER ERROR: ${error.localizedMessage}")
+                displayErrorMessage(error.localizedMessage)
             }
         }
     }
@@ -203,6 +212,8 @@ class AuthenticationViewModel(
                 call.enqueue(object: Callback<UserResponse> {
                     override fun onResponse(call: Call<UserResponse>, res: Response<UserResponse>) {
                         if (res.isSuccessful) {
+                            saveUsernameToken(res.body()!!.data.token!!, res.body()!!.data.username)
+
                             dataStatus = UserDataStatusUIState.Success(res.body()!!.data)
 
                             navController.navigate(PagesEnum.Home.name) {
@@ -216,22 +227,33 @@ class AuthenticationViewModel(
                                 UserResponse::class.java
                             )
 
-                            Log.d("error-data", "ERROR DATA: ${errorMessage}")
-                            dataStatus = UserDataStatusUIState.Failed(
-                                errorMessage.errors
-                            )
+                            displayErrorMessage(errorMessage.errors)
+
+                            Log.d("error-data", "ERROR DATA: ${errorMessage.errors}")
+                            dataStatus = UserDataStatusUIState.Start
                         }
                     }
 
                     override fun onFailure(call: Call<UserResponse>, t: Throwable) {
-                        dataStatus = UserDataStatusUIState.Failed(t.localizedMessage)
+                        dataStatus = UserDataStatusUIState.Start
+
+                        displayErrorMessage(t.localizedMessage)
                     }
 
                 })
             } catch (error: IOException) {
-                dataStatus = UserDataStatusUIState.Failed(error.localizedMessage)
+                dataStatus = UserDataStatusUIState.Start
                 Log.d("register-error", "LOGIN ERROR: ${error.toString()}")
+
+                displayErrorMessage(error.localizedMessage)
             }
+        }
+    }
+
+    fun saveUsernameToken(token: String, username: String) {
+        viewModelScope.launch {
+            userRepository.saveUserToken(token)
+            userRepository.saveUsername(username)
         }
     }
 
@@ -240,7 +262,8 @@ class AuthenticationViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as TodoListApplication)
                 val authenticationRepository = application.container.authenticationRepository
-                AuthenticationViewModel(authenticationRepository)
+                val userRepository = application.container.userRepository
+                AuthenticationViewModel(authenticationRepository, userRepository)
             }
         }
     }
@@ -258,7 +281,24 @@ class AuthenticationViewModel(
                 confirmPasswordVisibility = PasswordVisualTransformation(),
                 passwordVisibilityIcon = R.drawable.ic_password_visible,
                 confirmPasswordVisibilityIcon = R.drawable.ic_password_visible,
-                buttonEnabled = false
+                buttonEnabled = false,
+                errorMessage = null
+            )
+        }
+    }
+
+    fun displayErrorMessage(message: String) {
+        _authenticationUIState.update { currentState ->
+            currentState.copy(
+                errorMessage = message
+            )
+        }
+    }
+
+    fun clearErrorMessage() {
+        _authenticationUIState.update { currentState ->
+            currentState.copy(
+                errorMessage = null
             )
         }
     }

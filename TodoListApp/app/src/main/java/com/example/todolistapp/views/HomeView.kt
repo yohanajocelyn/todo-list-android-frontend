@@ -47,6 +47,7 @@ fun HomeView(
     navController: NavHostController
 ) {
     val todoList = homeViewModel.todoModel.collectAsState()
+    val username = homeViewModel.username.collectAsState()
 
     Column(
         modifier = modifier
@@ -63,7 +64,7 @@ fun HomeView(
                 color = Color.Black
             )
             Text(
-                text = "Asdf", // TODO: put username data here
+                text = username.value,
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black

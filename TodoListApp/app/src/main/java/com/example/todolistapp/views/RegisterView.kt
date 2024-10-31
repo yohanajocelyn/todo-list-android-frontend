@@ -1,5 +1,7 @@
 package com.example.todolistapp.views
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,12 +13,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,10 +46,18 @@ import com.example.todolistapp.views.templates.PasswordOutlinedTextField
 fun RegisterView(
     authenticationViewModel: AuthenticationViewModel,
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    context: Context
 ) {
     val registerUIState by authenticationViewModel.authenticationUIState.collectAsState()
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(registerUIState.errorMessage) {
+        if (registerUIState.errorMessage != null) {
+            Toast.makeText(context, registerUIState.errorMessage, Toast.LENGTH_SHORT).show()
+            authenticationViewModel.clearErrorMessage()
+        }
+    }
 
     Column(
         modifier = modifier,
@@ -214,7 +226,8 @@ fun RegisterViewPreview() {
                 .fillMaxSize()
                 .padding(20.dp),
             authenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory),
-            navController = rememberNavController()
+            navController = rememberNavController(),
+            context = LocalContext.current
         )
     }
 }

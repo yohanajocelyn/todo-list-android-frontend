@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -22,7 +21,7 @@ import com.example.todolistapp.viewModels.TodoListFormViewModel
 @Composable
 fun TodoListApp(
     navController: NavHostController = rememberNavController(),
-    homeViewModel: HomeViewModel = viewModel(),
+    homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
     todoListFormViewModel: TodoListFormViewModel = viewModel(),
     authenticationViewModel: AuthenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory)
 ) {
@@ -35,7 +34,8 @@ fun TodoListApp(
                     .fillMaxSize()
                     .padding(20.dp),
                 authenticationViewModel = authenticationViewModel,
-                navController = navController
+                navController = navController,
+                context = localContext
             )
         }
 
@@ -45,7 +45,8 @@ fun TodoListApp(
                     .fillMaxSize()
                     .padding(20.dp),
                 authenticationViewModel = authenticationViewModel,
-                navController = navController
+                navController = navController,
+                context = localContext
             )
         }
 
