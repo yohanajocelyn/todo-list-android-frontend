@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +37,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
 import com.example.todolistapp.enums.PagesEnum
-import com.example.todolistapp.enums.PrioritiesEnum
 import com.example.todolistapp.viewModels.HomeViewModel
 import com.example.todolistapp.views.templates.TodoListCardTemplate
 
@@ -52,10 +52,27 @@ fun HomeView(
     Column(
         modifier = modifier
     ) {
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier
+                .align(alignment = Alignment.End)
+                .padding(end = 10.dp, top = 10.dp)
+                .size(45.dp),
+            colors = ButtonDefaults.buttonColors(Color.Red),
+            contentPadding = PaddingValues(0.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_logout),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color.White),
+                modifier = Modifier
+                    .size(20.dp)
+            )
+        }
+
         Column(
             modifier = Modifier
-                .padding(20.dp)
-                .padding(top = 20.dp)
+                .padding(top = 20.dp, start = 10.dp, bottom = 10.dp),
         ) {
             Text(
                 text = "Welcome",
