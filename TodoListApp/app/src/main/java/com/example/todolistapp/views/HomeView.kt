@@ -48,12 +48,16 @@ fun HomeView(
 ) {
     val todoList = homeViewModel.todoModel.collectAsState()
     val username = homeViewModel.username.collectAsState()
+    val homeUIState = homeViewModel.homeUIState.collectAsState()
+    val token = homeViewModel.token.collectAsState()
 
     Column(
         modifier = modifier
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                homeViewModel.logoutUser(token.value, navController)
+            },
             modifier = Modifier
                 .align(alignment = Alignment.End)
                 .padding(end = 10.dp, top = 10.dp)

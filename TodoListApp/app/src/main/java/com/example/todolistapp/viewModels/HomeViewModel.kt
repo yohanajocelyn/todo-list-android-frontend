@@ -12,7 +12,9 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.NavHostController
 import com.example.todolistapp.TodoListApplication
+import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.enums.PrioritiesEnum
 import com.example.todolistapp.models.GeneralResponseModel
 import com.example.todolistapp.models.TodoModel
@@ -60,6 +62,12 @@ class HomeViewModel(
         initialValue = ""
     )
 
+    val token: StateFlow<String> = userRepository.currentUserToken.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = ""
+    )
+
     init {
         _todoModel.value.add(
            TodoModel(
@@ -84,7 +92,7 @@ class HomeViewModel(
         return Color.Green
     }
 
-    fun logoutUser(token: String) {
+    fun logoutUser(token: String, navController: NavHostController) {
         viewModelScope.launch {
             dataStatus = LogoutStatusUIState.Loading
 
@@ -95,6 +103,12 @@ class HomeViewModel(
                     override fun onResponse(call: Call<GeneralResponseModel>, res: Response<GeneralResponseModel>) {
                         if (res.isSuccessful) {
                             dataStatus = LogoutStatusUIState.Success(responseData = res.body()!!.data)
+
+                            navController.navigate(PagesEnum.Login.name) {
+                                popUpTo(PagesEnum.Home.name) {
+                                    inclusive = true
+                                }
+                            }
                         } else {
                             dataStatus = LogoutStatusUIState.Start
                             // set error message toast
