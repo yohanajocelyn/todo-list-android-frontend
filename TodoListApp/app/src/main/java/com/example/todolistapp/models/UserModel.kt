@@ -1,8 +1,7 @@
 package com.example.todolistapp.models
 
 data class UserResponse(
-    val data: UserModel,
-    val errors: String
+    val data: UserModel
 )
 
 data class UserModel (

@@ -23,7 +23,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.todolistapp.R
-import com.example.todolistapp.uiStates.UserDataStatusUIState
+import com.example.todolistapp.uiStates.AuthenticationStatusUIState
 
 @Composable
 fun AuthenticationOutlinedTextField(
@@ -125,11 +125,11 @@ fun AuthenticationButton(
     textModifier: Modifier = Modifier,
     buttonEnabled: Boolean,
     buttonColor: Color,
-    userDataStatusUIState: UserDataStatusUIState,
+    userDataStatusUIState: AuthenticationStatusUIState,
     loadingBarModifier: Modifier = Modifier
 ) {
     when(userDataStatusUIState) {
-        is UserDataStatusUIState.Loading -> CircleLoadingTemplate(
+        is AuthenticationStatusUIState.Loading -> CircleLoadingTemplate(
             modifier = loadingBarModifier,
             color = Color.Blue,
             trackColor = Color.Transparent

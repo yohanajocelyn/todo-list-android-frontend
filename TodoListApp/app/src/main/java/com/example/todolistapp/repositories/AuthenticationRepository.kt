@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import com.example.todolistapp.models.UserModel
 import com.example.todolistapp.models.UserResponse
 import com.example.todolistapp.services.AuthenticationAPIService
-import com.example.todolistapp.uiStates.UserDataStatusUIState
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

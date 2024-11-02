@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -22,12 +23,17 @@ import com.example.todolistapp.viewModels.TodoListFormViewModel
 fun TodoListApp(
     navController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
-    todoListFormViewModel: TodoListFormViewModel = viewModel(),
+    todoListFormViewModel: TodoListFormViewModel = viewModel(factory = TodoListFormViewModel.Factory),
     authenticationViewModel: AuthenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory)
 ) {
     val localContext = LocalContext.current
+    val token = homeViewModel.token.collectAsState()
 
-    NavHost(navController = navController, startDestination = PagesEnum.Login.name) {
+    NavHost(navController = navController, startDestination = if(token.value != null && token.value != "Unknown") {
+        PagesEnum.Home.name
+    } else {
+        PagesEnum.Login.name
+    }) {
         composable(route = PagesEnum.Login.name) {
             LoginView(
                 modifier = Modifier
@@ -56,7 +62,8 @@ fun TodoListApp(
                     .fillMaxSize()
                     .background(Color.White),
                 homeViewModel = homeViewModel,
-                navController = navController
+                navController = navController,
+                token = token.value
             )
         }
 
@@ -67,7 +74,8 @@ fun TodoListApp(
                     .padding(16.dp),
                 context = localContext,
                 todoListFormViewModel =  todoListFormViewModel,
-                navController = navController
+                navController = navController,
+                token = token.value
             )
         }
 
@@ -76,7 +84,8 @@ fun TodoListApp(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
-                navController = navController
+                navController = navController,
+                token = token.value
             )
         }
     }

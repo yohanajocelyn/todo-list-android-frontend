@@ -1,7 +1,6 @@
 package com.example.todolistapp.viewModels
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,19 +15,21 @@ import androidx.navigation.NavHostController
 import com.example.todolistapp.TodoListApplication
 import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.enums.PrioritiesEnum
+import com.example.todolistapp.models.ErrorModel
 import com.example.todolistapp.models.GeneralResponseModel
 import com.example.todolistapp.models.TodoModel
-import com.example.todolistapp.models.UserModel
+import com.example.todolistapp.models.TodoResponse
+import com.example.todolistapp.models.UserResponse
+import com.example.todolistapp.repositories.TodoRepository
 import com.example.todolistapp.repositories.UserRepository
-import com.example.todolistapp.uiStates.AuthenticationUIState
-import com.example.todolistapp.uiStates.HomeUIState
+import com.example.todolistapp.uiStates.AuthenticationStatusUIState
 import com.example.todolistapp.uiStates.LogoutStatusUIState
-import com.example.todolistapp.uiStates.UserDataStatusUIState
+import com.example.todolistapp.uiStates.TodoDataStatusUIState
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -38,23 +39,18 @@ import retrofit2.Response
 import java.io.IOException
 
 class HomeViewModel(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val todoRepository: TodoRepository
 ): ViewModel() {
-    private val _todoModel = MutableStateFlow<MutableList<TodoModel>>(mutableListOf())
+//    private val _todoModel = MutableStateFlow<MutableList<TodoModel>>(mutableListOf())
+//
+//    val todoModel: StateFlow<List<TodoModel>>
+//        get() {
+//            return _todoModel.asStateFlow()
+//        }
 
-    val todoModel: StateFlow<List<TodoModel>>
-        get() {
-            return _todoModel.asStateFlow()
-        }
-
-    private val _homeUIState = MutableStateFlow(HomeUIState())
-
-    val homeUIState: StateFlow<HomeUIState>
-        get() {
-            return _homeUIState.asStateFlow()
-        }
-
-    var dataStatus: LogoutStatusUIState by mutableStateOf(LogoutStatusUIState.Start)
+    var logoutStatus: LogoutStatusUIState by mutableStateOf(LogoutStatusUIState.Start)
+    var dataStatus: TodoDataStatusUIState by mutableStateOf(TodoDataStatusUIState.Start)
 
     val username: StateFlow<String> = userRepository.currentUsername.stateIn(
         scope = viewModelScope,
@@ -69,15 +65,8 @@ class HomeViewModel(
     )
 
     init {
-        _todoModel.value.add(
-           TodoModel(
-               title = "hello world",
-               description = "alskdjfk;ashdpfuihqwpeiuhf",
-               priority = PrioritiesEnum.High,
-               dueDate = "12 October 2022",
-               status = "On Going"
-           )
-        )
+        // TODO: Fix this bug
+        getAllTodos()
     }
 
     fun changePriorityTextBackgroundColor(
@@ -94,7 +83,9 @@ class HomeViewModel(
 
     fun logoutUser(token: String, navController: NavHostController) {
         viewModelScope.launch {
-            dataStatus = LogoutStatusUIState.Loading
+            logoutStatus = LogoutStatusUIState.Loading
+
+            Log.d("token-logout", "LOGOUT TOKEN: ${token}")
 
             try {
                 val call = userRepository.logout(token)
@@ -102,7 +93,9 @@ class HomeViewModel(
                 call.enqueue(object: Callback<GeneralResponseModel>{
                     override fun onResponse(call: Call<GeneralResponseModel>, res: Response<GeneralResponseModel>) {
                         if (res.isSuccessful) {
-                            dataStatus = LogoutStatusUIState.Success(responseData = res.body()!!.data)
+                            logoutStatus = LogoutStatusUIState.Success(responseData = res.body()!!.data)
+
+                            saveUsernameToken("Unknown", "Unknown")
 
                             navController.navigate(PagesEnum.Login.name) {
                                 popUpTo(PagesEnum.Home.name) {
@@ -110,22 +103,57 @@ class HomeViewModel(
                                 }
                             }
                         } else {
-                            dataStatus = LogoutStatusUIState.Start
+                            val errorMessage = Gson().fromJson(
+                                res.errorBody()!!.charStream(),
+                                ErrorModel::class.java
+                            )
+
+                            logoutStatus = LogoutStatusUIState.Failed(errorMessage.errors)
                             // set error message toast
-                            displayErrorMessage(res.body()!!.errors)
                         }
                     }
 
                     override fun onFailure(call: Call<GeneralResponseModel>, t: Throwable) {
-                        dataStatus = LogoutStatusUIState.Start
+                        logoutStatus = LogoutStatusUIState.Failed(t.localizedMessage)
                         Log.d("logout-failure", t.localizedMessage)
-                        displayErrorMessage(t.localizedMessage)
                     }
                 })
             } catch (error: IOException) {
-                dataStatus = LogoutStatusUIState.Start
+                logoutStatus = LogoutStatusUIState.Failed(error.localizedMessage)
                 Log.d("logout-error", error.localizedMessage)
-                displayErrorMessage(error.localizedMessage)
+            }
+        }
+    }
+
+    fun getAllTodos() {
+        viewModelScope.launch {
+            Log.d("token-home", "TOKEN AT HOME: ${token.value}")
+
+            dataStatus = TodoDataStatusUIState.Loading
+
+            try {
+                val call = todoRepository.getAllTodos(token.value)
+                call.enqueue(object : Callback<TodoResponse> {
+                    override fun onResponse(call: Call<TodoResponse>, res: Response<TodoResponse>) {
+                        if (res.isSuccessful) {
+                            dataStatus = TodoDataStatusUIState.Success(res.body()!!.data)
+                        } else {
+                            val errorMessage = Gson().fromJson(
+                                res.errorBody()!!.charStream(),
+                                ErrorModel::class.java
+                            )
+
+                            dataStatus = TodoDataStatusUIState.Failed(errorMessage.errors)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<TodoResponse>, t: Throwable) {
+                        dataStatus = TodoDataStatusUIState.Failed(t.localizedMessage)
+                    }
+
+                })
+            } catch (error: IOException) {
+                dataStatus = TodoDataStatusUIState.Failed(error.localizedMessage)
             }
         }
     }
@@ -135,16 +163,26 @@ class HomeViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as TodoListApplication)
                 val userRepository = application.container.userRepository
-                HomeViewModel(userRepository)
+                val todoRepository = application.container.todoRepository
+                HomeViewModel(userRepository, todoRepository)
             }
         }
     }
 
-    fun displayErrorMessage(message: String) {
-        _homeUIState.update { currentState ->
-            currentState.copy(
-                errorMessage = message
-            )
+    fun convertStringToEnum(text: String): PrioritiesEnum {
+        if (text == "High") {
+            return PrioritiesEnum.High
+        } else if (text == "Medium") {
+            return PrioritiesEnum.Medium
+        } else {
+            return PrioritiesEnum.Low
+        }
+    }
+
+    fun saveUsernameToken(token: String, username: String) {
+        viewModelScope.launch {
+            userRepository.saveUserToken(token)
+            userRepository.saveUsername(username)
         }
     }
 }

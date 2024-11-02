@@ -35,7 +35,8 @@ import com.example.todolistapp.enums.PagesEnum
 @Composable
 fun TodoListDetailView (
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    token: String
 ) {
     Column(
         modifier = modifier
@@ -216,6 +217,7 @@ fun TodoListDetailViewPreview() {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        navController = rememberNavController()
+        navController = rememberNavController(),
+        token = ""
     )
 }

@@ -7,4 +7,5 @@ sealed interface LogoutStatusUIState {
     data class Success(val responseData: String): LogoutStatusUIState
     object Loading: LogoutStatusUIState
     object Start: LogoutStatusUIState
+    data class Failed(val errorMessage: String): LogoutStatusUIState
 }

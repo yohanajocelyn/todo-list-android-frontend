@@ -37,30 +37,35 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
 import com.example.todolistapp.enums.PagesEnum
+import com.example.todolistapp.uiStates.AuthenticationStatusUIState
+import com.example.todolistapp.uiStates.LogoutStatusUIState
+import com.example.todolistapp.uiStates.TodoDataStatusUIState
 import com.example.todolistapp.viewModels.HomeViewModel
+import com.example.todolistapp.views.templates.CircleLoadingTemplate
 import com.example.todolistapp.views.templates.TodoListCardTemplate
 
 @Composable
 fun HomeView(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    token: String
 ) {
-    val todoList = homeViewModel.todoModel.collectAsState()
+//    val todoList = homeViewModel.todoModel.collectAsState()
     val username = homeViewModel.username.collectAsState()
-    val homeUIState = homeViewModel.homeUIState.collectAsState()
-    val token = homeViewModel.token.collectAsState()
+    val logoutStatus = homeViewModel.logoutStatus
+    val dataStatus = homeViewModel.dataStatus
 
     Column(
         modifier = modifier
     ) {
         Button(
             onClick = {
-                homeViewModel.logoutUser(token.value, navController)
+                homeViewModel.logoutUser(token, navController)
             },
             modifier = Modifier
                 .align(alignment = Alignment.End)
-                .padding(end = 10.dp, top = 10.dp)
+                .padding(end = 10.dp, top = 20.dp)
                 .size(45.dp),
             colors = ButtonDefaults.buttonColors(Color.Red),
             contentPadding = PaddingValues(0.dp)
@@ -140,28 +145,53 @@ fun HomeView(
                     }
                 }
 
-                LazyColumn(
-                    flingBehavior = ScrollableDefaults.flingBehavior(),
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                ) {
-                    items(todoList.value) { todo ->
-                        TodoListCardTemplate(
-                            title = todo.title,
-                            priority = todo.priority,
-                            dueDate = todo.dueDate,
-                            status = todo.status,
-                            priorityColor = homeViewModel.changePriorityTextBackgroundColor(todo.priority),
-                            modifier = Modifier
-                                .padding(bottom = 12.dp),
-                            onCardClick = {
-                                navController.navigate(PagesEnum.TodoDetail.name) {
-                                    popUpTo(PagesEnum.Home.name) {
-                                        inclusive = false
+                when (dataStatus) {
+                    is TodoDataStatusUIState.Success -> LazyColumn(
+                        flingBehavior = ScrollableDefaults.flingBehavior(),
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                    ) {
+                        items(dataStatus.data) { todo ->
+                            TodoListCardTemplate(
+                                title = todo.title,
+                                priority = homeViewModel.convertStringToEnum(todo.priority),
+                                dueDate = todo.dueDate,
+                                status = todo.status,
+                                priorityColor = homeViewModel.changePriorityTextBackgroundColor(homeViewModel.convertStringToEnum(todo.priority)),
+                                modifier = Modifier
+                                    .padding(bottom = 12.dp),
+                                onCardClick = {
+                                    navController.navigate(PagesEnum.TodoDetail.name) {
+                                        popUpTo(PagesEnum.Home.name) {
+                                            inclusive = false
+                                        }
                                     }
                                 }
-                            }
+                            )
+                        }
+                    }
+                    is TodoDataStatusUIState.Failed -> Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "No Task Found!",
+                            fontSize = 21.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    else -> Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircleLoadingTemplate(
+                            color = Color.White,
+                            trackColor = Color.Transparent,
                         )
                     }
                 }
@@ -180,7 +210,8 @@ fun HomeViewPreview() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
-        homeViewModel = viewModel(),
-        navController = rememberNavController()
+        homeViewModel = viewModel(factory = HomeViewModel.Factory),
+        navController = rememberNavController(),
+        token = ""
     )
 }

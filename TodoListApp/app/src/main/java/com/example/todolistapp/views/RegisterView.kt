@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
 import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.ui.theme.TodoListAppTheme
+import com.example.todolistapp.uiStates.AuthenticationStatusUIState
 import com.example.todolistapp.viewModels.AuthenticationViewModel
 import com.example.todolistapp.views.templates.AuthenticationButton
 import com.example.todolistapp.views.templates.AuthenticationQuestion
@@ -52,9 +53,10 @@ fun RegisterView(
     val registerUIState by authenticationViewModel.authenticationUIState.collectAsState()
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(registerUIState.errorMessage) {
-        if (registerUIState.errorMessage != null) {
-            Toast.makeText(context, registerUIState.errorMessage, Toast.LENGTH_SHORT).show()
+    LaunchedEffect(authenticationViewModel.dataStatus) {
+        val dataStatus = authenticationViewModel.dataStatus
+        if (dataStatus is AuthenticationStatusUIState.Failed) {
+            Toast.makeText(context, dataStatus.errorMessage, Toast.LENGTH_SHORT).show()
             authenticationViewModel.clearErrorMessage()
         }
     }

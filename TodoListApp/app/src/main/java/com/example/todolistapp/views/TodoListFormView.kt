@@ -1,6 +1,7 @@
 package com.example.todolistapp.views
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,19 +28,32 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
 import com.example.todolistapp.enums.PagesEnum
+import com.example.todolistapp.uiStates.AuthenticationStatusUIState
+import com.example.todolistapp.uiStates.TodoListFormStatusUIState
 import com.example.todolistapp.viewModels.TodoListFormViewModel
+import com.example.todolistapp.views.templates.CircleLoadingTemplate
 import com.example.todolistapp.views.templates.TodoListDatePicker
 import com.example.todolistapp.views.templates.TodoListDropdown
 import com.example.todolistapp.views.templates.TodoListOutlinedTextField
 
 @Composable
 fun TodoListFormView(
-    todoListFormViewModel: TodoListFormViewModel = viewModel(),
+    todoListFormViewModel: TodoListFormViewModel,
     modifier: Modifier = Modifier,
     context: Context,
-    navController: NavHostController
+    navController: NavHostController,
+    token: String
 ) {
     val todoListFormUIState = todoListFormViewModel.todoListFormUIState.collectAsState()
+    val submissionStatus = todoListFormViewModel.submissionStatus
+
+    LaunchedEffect(todoListFormViewModel.submissionStatus) {
+        val dataStatus = todoListFormViewModel.submissionStatus
+        if (dataStatus is TodoListFormStatusUIState.Failed) {
+            Toast.makeText(context, dataStatus.errorMessage, Toast.LENGTH_SHORT).show()
+            todoListFormViewModel.clearErrorMessage()
+        }
+    }
 
     Column(
         modifier = modifier,
@@ -153,22 +168,28 @@ fun TodoListFormView(
                 Text(text = stringResource(R.string.cancel_text))
             }
 
-            Button(
-                onClick = {
-                    // TODO: Add on save button click event handler
-                    navController.navigate(PagesEnum.Home.name) {
-                        popUpTo(PagesEnum.CreateTodo.name) {
-                            inclusive = true
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth(),
-                enabled = todoListFormUIState.value.saveButtonEnabled,
-                colors = ButtonDefaults.buttonColors(todoListFormViewModel.changeSaveButtonColor())
-            ) {
-                Text(text = stringResource(R.string.save_text))
+            when(submissionStatus) {
+                is TodoListFormStatusUIState.Loading -> CircleLoadingTemplate(
+                    color = Color.Blue,
+                    trackColor = Color.Transparent,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                )
+                else -> Button(
+                    onClick = {
+                        // TODO: Add on save button click event handler
+                        todoListFormViewModel.createTodo(navController, token = token)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    enabled = todoListFormUIState.value.saveButtonEnabled,
+                    colors = ButtonDefaults.buttonColors(todoListFormViewModel.changeSaveButtonColor())
+                ) {
+                    Text(text = stringResource(R.string.save_text))
+                }
             }
+
         }
     }
 }
@@ -185,6 +206,8 @@ fun CreateTodoListViewPreview() {
             .padding(8.dp)
             .padding(top = 8.dp),
         context = LocalContext.current,
-        navController = rememberNavController()
+        navController = rememberNavController(),
+        todoListFormViewModel = viewModel(factory = TodoListFormViewModel.Factory),
+        token = ""
     )
 }

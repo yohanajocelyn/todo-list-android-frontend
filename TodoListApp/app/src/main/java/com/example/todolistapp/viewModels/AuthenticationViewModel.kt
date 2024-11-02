@@ -17,12 +17,13 @@ import androidx.navigation.NavHostController
 import com.example.todolistapp.R
 import com.example.todolistapp.TodoListApplication
 import com.example.todolistapp.enums.PagesEnum
+import com.example.todolistapp.models.ErrorModel
 import com.example.todolistapp.models.UserResponse
 import com.example.todolistapp.repositories.AuthenticationRepository
 import com.example.todolistapp.repositories.NetworkUserRepository
 import com.example.todolistapp.repositories.UserRepository
+import com.example.todolistapp.uiStates.AuthenticationStatusUIState
 import com.example.todolistapp.uiStates.AuthenticationUIState
-import com.example.todolistapp.uiStates.UserDataStatusUIState
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,7 +46,8 @@ class AuthenticationViewModel(
             return _authenticationUIState.asStateFlow()
         }
 
-    var dataStatus: UserDataStatusUIState by mutableStateOf(UserDataStatusUIState.Start)
+    var dataStatus: AuthenticationStatusUIState by mutableStateOf(AuthenticationStatusUIState.Start)
+        private set
 
     var usernameInput by mutableStateOf("")
         private set
@@ -153,7 +155,7 @@ class AuthenticationViewModel(
 
     fun registerUser(navController: NavHostController) {
         viewModelScope.launch {
-            dataStatus = UserDataStatusUIState.Loading
+            dataStatus = AuthenticationStatusUIState.Loading
 
             try {
                 val call = authenticationRepository.register(usernameInput, emailInput, passwordInput)
@@ -166,7 +168,7 @@ class AuthenticationViewModel(
 
                             saveUsernameToken(res.body()!!.data.token!!, res.body()!!.data.username)
 
-                            dataStatus = UserDataStatusUIState.Success(res.body()!!.data)
+                            dataStatus = AuthenticationStatusUIState.Success(res.body()!!.data)
 
                             navController.navigate(PagesEnum.Home.name) {
                                 popUpTo(PagesEnum.Register.name) {
@@ -177,27 +179,23 @@ class AuthenticationViewModel(
                             // get error message
                             val errorMessage = Gson().fromJson(
                                 res.errorBody()!!.charStream(),
-                                UserResponse::class.java
+                                ErrorModel::class.java
                             )
 
-                            displayErrorMessage(errorMessage.errors)
-
                             Log.d("error-data", "ERROR DATA: ${errorMessage}")
-                            dataStatus = UserDataStatusUIState.Start
+                            dataStatus = AuthenticationStatusUIState.Failed(errorMessage.errors)
                         }
                     }
 
                     override fun onFailure(call: Call<UserResponse>, t: Throwable) {
                         Log.d("error-data", "ERROR DATA: ${t.localizedMessage}")
-                        dataStatus = UserDataStatusUIState.Start
-                        displayErrorMessage(t.localizedMessage)
+                        dataStatus = AuthenticationStatusUIState.Failed(t.localizedMessage)
                     }
 
                 })
             } catch (error: IOException) {
-                dataStatus = UserDataStatusUIState.Start
+                dataStatus = AuthenticationStatusUIState.Failed(error.localizedMessage)
                 Log.d("register-error", "REGISTER ERROR: ${error.localizedMessage}")
-                displayErrorMessage(error.localizedMessage)
             }
         }
     }
@@ -206,7 +204,7 @@ class AuthenticationViewModel(
         navController: NavHostController
     ) {
         viewModelScope.launch {
-            dataStatus = UserDataStatusUIState.Loading
+            dataStatus = AuthenticationStatusUIState.Loading
             try {
                 val call = authenticationRepository.login(emailInput, passwordInput)
                 call.enqueue(object: Callback<UserResponse> {
@@ -214,7 +212,7 @@ class AuthenticationViewModel(
                         if (res.isSuccessful) {
                             saveUsernameToken(res.body()!!.data.token!!, res.body()!!.data.username)
 
-                            dataStatus = UserDataStatusUIState.Success(res.body()!!.data)
+                            dataStatus = AuthenticationStatusUIState.Success(res.body()!!.data)
 
                             navController.navigate(PagesEnum.Home.name) {
                                 popUpTo(PagesEnum.Login.name) {
@@ -224,28 +222,22 @@ class AuthenticationViewModel(
                         } else {
                             val errorMessage = Gson().fromJson(
                                 res.errorBody()!!.charStream(),
-                                UserResponse::class.java
+                                ErrorModel::class.java
                             )
 
-                            displayErrorMessage(errorMessage.errors)
-
                             Log.d("error-data", "ERROR DATA: ${errorMessage.errors}")
-                            dataStatus = UserDataStatusUIState.Start
+                            dataStatus = AuthenticationStatusUIState.Failed(errorMessage.errors)
                         }
                     }
 
                     override fun onFailure(call: Call<UserResponse>, t: Throwable) {
-                        dataStatus = UserDataStatusUIState.Start
-
-                        displayErrorMessage(t.localizedMessage)
+                        dataStatus = AuthenticationStatusUIState.Failed(t.localizedMessage)
                     }
 
                 })
             } catch (error: IOException) {
-                dataStatus = UserDataStatusUIState.Start
+                dataStatus = AuthenticationStatusUIState.Failed(error.localizedMessage)
                 Log.d("register-error", "LOGIN ERROR: ${error.toString()}")
-
-                displayErrorMessage(error.localizedMessage)
             }
         }
     }
@@ -281,25 +273,13 @@ class AuthenticationViewModel(
                 confirmPasswordVisibility = PasswordVisualTransformation(),
                 passwordVisibilityIcon = R.drawable.ic_password_visible,
                 confirmPasswordVisibilityIcon = R.drawable.ic_password_visible,
-                buttonEnabled = false,
-                errorMessage = null
+                buttonEnabled = false
             )
         }
-    }
-
-    fun displayErrorMessage(message: String) {
-        _authenticationUIState.update { currentState ->
-            currentState.copy(
-                errorMessage = message
-            )
-        }
+        dataStatus = AuthenticationStatusUIState.Start
     }
 
     fun clearErrorMessage() {
-        _authenticationUIState.update { currentState ->
-            currentState.copy(
-                errorMessage = null
-            )
-        }
+        dataStatus = AuthenticationStatusUIState.Start
     }
 }
