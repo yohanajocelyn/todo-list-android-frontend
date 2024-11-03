@@ -173,8 +173,7 @@ fun TodoListFormView(
                     color = Color.Blue,
                     trackColor = Color.Transparent,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
+                        .padding(top = 4.dp)
                 )
                 else -> Button(
                     onClick = {

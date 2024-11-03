@@ -29,7 +29,7 @@ fun TodoListApp(
     val localContext = LocalContext.current
     val token = homeViewModel.token.collectAsState()
 
-    NavHost(navController = navController, startDestination = if(token.value != null && token.value != "Unknown") {
+    NavHost(navController = navController, startDestination = if(token.value != "Unknown" && token.value != "") {
         PagesEnum.Home.name
     } else {
         PagesEnum.Login.name

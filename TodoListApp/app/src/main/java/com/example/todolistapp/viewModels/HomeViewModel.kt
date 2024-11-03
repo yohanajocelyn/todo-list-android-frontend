@@ -50,7 +50,10 @@ class HomeViewModel(
 //        }
 
     var logoutStatus: LogoutStatusUIState by mutableStateOf(LogoutStatusUIState.Start)
+        private set
+
     var dataStatus: TodoDataStatusUIState by mutableStateOf(TodoDataStatusUIState.Start)
+        private set
 
     val username: StateFlow<String> = userRepository.currentUsername.stateIn(
         scope = viewModelScope,
@@ -63,11 +66,6 @@ class HomeViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = ""
     )
-
-    init {
-        // TODO: Fix this bug
-        getAllTodos()
-    }
 
     fun changePriorityTextBackgroundColor(
         priority: PrioritiesEnum
@@ -125,18 +123,20 @@ class HomeViewModel(
         }
     }
 
-    fun getAllTodos() {
+    fun getAllTodos(token: String) {
         viewModelScope.launch {
-            Log.d("token-home", "TOKEN AT HOME: ${token.value}")
+            Log.d("token-home", "TOKEN AT HOME: ${token}")
 
             dataStatus = TodoDataStatusUIState.Loading
 
             try {
-                val call = todoRepository.getAllTodos(token.value)
+                val call = todoRepository.getAllTodos(token)
                 call.enqueue(object : Callback<TodoResponse> {
                     override fun onResponse(call: Call<TodoResponse>, res: Response<TodoResponse>) {
                         if (res.isSuccessful) {
                             dataStatus = TodoDataStatusUIState.Success(res.body()!!.data)
+
+                            Log.d("data-result", "TODO LIST DATA: ${dataStatus}")
                         } else {
                             val errorMessage = Gson().fromJson(
                                 res.errorBody()!!.charStream(),

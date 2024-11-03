@@ -20,6 +20,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +56,10 @@ fun HomeView(
     val username = homeViewModel.username.collectAsState()
     val logoutStatus = homeViewModel.logoutStatus
     val dataStatus = homeViewModel.dataStatus
+
+    LaunchedEffect(true) {
+        homeViewModel.getAllTodos(token)
+    }
 
     Column(
         modifier = modifier
