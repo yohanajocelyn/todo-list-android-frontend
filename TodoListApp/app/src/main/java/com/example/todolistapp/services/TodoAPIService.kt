@@ -2,17 +2,30 @@ package com.example.todolistapp.services
 
 import com.example.todolistapp.models.GeneralResponseModel
 import com.example.todolistapp.models.TodoModel
+import com.example.todolistapp.models.TodoRequest
 import com.example.todolistapp.models.TodoResponse
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
 interface TodoAPIService {
     @GET("api/todo-list")
     fun getAllTodos(@Header("X-API-TOKEN") token: String): Call<TodoResponse>
 
+    @GET("api/todo-list/{id}")
+    fun getTodo(@Header("X-API-TOKEN") token: String, @Path("id") todoId: Int): Call<TodoModel>
+
     @POST("api/todo-list")
-    fun createTodo(@Header("X-API-TOKEN") token: String, @Body todoModel: TodoModel): Call<GeneralResponseModel>
+    fun createTodo(@Header("X-API-TOKEN") token: String, @Body todoModel: TodoRequest): Call<GeneralResponseModel>
+
+    @PUT("api/todo-list/{id}")
+    fun updateTodo(@Header("X-API-TOKEN") token: String, @Path("id") todoId: Int, @Body todoModel: TodoRequest): Call<GeneralResponseModel>
+
+    @DELETE("api/todo-list/{id}")
+    fun deleteTodo(@Header("X-API-TOKEN") token: String, @Path("id") todoId: Int): Call<GeneralResponseModel>
 }
