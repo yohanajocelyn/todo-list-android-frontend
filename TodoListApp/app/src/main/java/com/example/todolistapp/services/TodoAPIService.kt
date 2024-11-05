@@ -1,9 +1,10 @@
 package com.example.todolistapp.services
 
 import com.example.todolistapp.models.GeneralResponseModel
+import com.example.todolistapp.models.GetAllTodoResponse
+import com.example.todolistapp.models.GetTodoResponse
 import com.example.todolistapp.models.TodoModel
 import com.example.todolistapp.models.TodoRequest
-import com.example.todolistapp.models.TodoResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -15,10 +16,10 @@ import retrofit2.http.Path
 
 interface TodoAPIService {
     @GET("api/todo-list")
-    fun getAllTodos(@Header("X-API-TOKEN") token: String): Call<TodoResponse>
+    fun getAllTodos(@Header("X-API-TOKEN") token: String): Call<GetAllTodoResponse>
 
     @GET("api/todo-list/{id}")
-    fun getTodo(@Header("X-API-TOKEN") token: String, @Path("id") todoId: Int): Call<TodoModel>
+    fun getTodo(@Header("X-API-TOKEN") token: String, @Path("id") todoId: Int): Call<GetTodoResponse>
 
     @POST("api/todo-list")
     fun createTodo(@Header("X-API-TOKEN") token: String, @Body todoModel: TodoRequest): Call<GeneralResponseModel>

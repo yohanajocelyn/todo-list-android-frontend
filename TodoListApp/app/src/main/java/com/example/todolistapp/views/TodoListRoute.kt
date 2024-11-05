@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.viewModels.AuthenticationViewModel
 import com.example.todolistapp.viewModels.HomeViewModel
+import com.example.todolistapp.viewModels.TodoDetailViewModel
 import com.example.todolistapp.viewModels.TodoListFormViewModel
 
 @Composable
@@ -24,7 +25,8 @@ fun TodoListApp(
     navController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
     todoListFormViewModel: TodoListFormViewModel = viewModel(factory = TodoListFormViewModel.Factory),
-    authenticationViewModel: AuthenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory)
+    authenticationViewModel: AuthenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory),
+    todoDetailViewModel: TodoDetailViewModel = viewModel(factory = TodoDetailViewModel.Factory)
 ) {
     val localContext = LocalContext.current
     val token = homeViewModel.token.collectAsState()
@@ -63,7 +65,9 @@ fun TodoListApp(
                     .background(Color.White),
                 homeViewModel = homeViewModel,
                 navController = navController,
-                token = token.value
+                token = token.value,
+                todoDetailViewModel = todoDetailViewModel,
+                context = localContext
             )
         }
 
@@ -85,7 +89,9 @@ fun TodoListApp(
                     .fillMaxSize()
                     .padding(16.dp),
                 navController = navController,
-                token = token.value
+                token = token.value,
+                todoDetailViewModel = todoDetailViewModel,
+                context = localContext
             )
         }
     }

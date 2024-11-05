@@ -1,5 +1,7 @@
 package com.example.todolistapp.views
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -27,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,9 +42,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
 import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.uiStates.AuthenticationStatusUIState
-import com.example.todolistapp.uiStates.LogoutStatusUIState
+import com.example.todolistapp.uiStates.StringDataStatusUIState
 import com.example.todolistapp.uiStates.TodoDataStatusUIState
 import com.example.todolistapp.viewModels.HomeViewModel
+import com.example.todolistapp.viewModels.TodoDetailViewModel
+import com.example.todolistapp.views.templates.CircleLoadingDialog
 import com.example.todolistapp.views.templates.CircleLoadingTemplate
 import com.example.todolistapp.views.templates.TodoListCardTemplate
 
@@ -50,7 +55,9 @@ fun HomeView(
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel,
     navController: NavHostController,
-    token: String
+    todoDetailViewModel: TodoDetailViewModel,
+    token: String,
+    context: Context
 ) {
 //    val todoList = homeViewModel.todoModel.collectAsState()
     val username = homeViewModel.username.collectAsState()
@@ -61,148 +68,185 @@ fun HomeView(
         homeViewModel.getAllTodos(token)
     }
 
-    Column(
-        modifier = modifier
-    ) {
-        Button(
-            onClick = {
-                homeViewModel.logoutUser(token, navController)
-            },
-            modifier = Modifier
-                .align(alignment = Alignment.End)
-                .padding(end = 10.dp, top = 20.dp)
-                .size(45.dp),
-            colors = ButtonDefaults.buttonColors(Color.Red),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_logout),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(Color.White),
-                modifier = Modifier
-                    .size(20.dp)
-            )
+    LaunchedEffect(logoutStatus) {
+        if (logoutStatus is StringDataStatusUIState.Failed) {
+            Toast.makeText(context, logoutStatus.errorMessage, Toast.LENGTH_SHORT).show()
+            homeViewModel.clearLogoutErrorMessage()
         }
+    }
 
+    LaunchedEffect(dataStatus) {
+        if (dataStatus is TodoDataStatusUIState.Failed) {
+            Toast.makeText(context, dataStatus.errorMessage, Toast.LENGTH_SHORT).show()
+            homeViewModel.clearDataErrorMessage()
+        }
+    }
+
+    if (logoutStatus is StringDataStatusUIState.Loading) {
+        // show loading dialog
+        CircleLoadingDialog(
+            onDismissRequest = {
+
+            }
+        )
+    } else {
         Column(
-            modifier = Modifier
-                .padding(top = 20.dp, start = 10.dp, bottom = 10.dp),
+            modifier = modifier
         ) {
-            Text(
-                text = "Welcome",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Light,
-                color = Color.Black
-            )
-            Text(
-                text = username.value,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black
-            )
-        }
+            Button(
+                onClick = {
+                    homeViewModel.logoutUser(token, navController)
+                },
+                modifier = Modifier
+                    .align(alignment = Alignment.End)
+                    .padding(end = 10.dp, top = 20.dp)
+                    .size(45.dp),
+                colors = ButtonDefaults.buttonColors(Color.Red),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_logout),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.White),
+                    modifier = Modifier
+                        .size(20.dp)
+                )
+            }
 
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 20.dp),
-            shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
-            colors = CardDefaults.cardColors(Color.Black)
-        ) {
             Column(
                 modifier = Modifier
-                    .padding(start = 16.dp, top = 20.dp, end = 16.dp)
+                    .padding(top = 20.dp, start = 10.dp, bottom = 10.dp),
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                Text(
+                    text = "Welcome",
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Light,
+                    color = Color.Black
+                )
+                Text(
+                    text = username.value,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black
+                )
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 20.dp),
+                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+                colors = CardDefaults.cardColors(Color.Black)
+            ) {
+                Column(
                     modifier = Modifier
-                        .padding(start = 8.dp, bottom = 4.dp)
-                        .fillMaxWidth(),
-
-                    ) {
-                    Text(
-                        text = stringResource(R.string.today_tasks_text),
-                        fontSize = 27.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    Button(
-                        onClick = {
-                            navController.navigate(PagesEnum.CreateTodo.name) {
-                                popUpTo(PagesEnum.Home.name) {
-                                    inclusive = false
-                                }
-                            }
-                        },
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.buttonColors(Color.White),
+                        .padding(start = 16.dp, top = 20.dp, end = 16.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .size(40.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_add),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(20.dp)
+                            .padding(start = 8.dp, bottom = 4.dp)
+                            .fillMaxWidth(),
+
+                        ) {
+                        Text(
+                            text = stringResource(R.string.today_tasks_text),
+                            fontSize = 27.sp,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
                         )
-                    }
-                }
 
-                when (dataStatus) {
-                    is TodoDataStatusUIState.Success -> LazyColumn(
-                        flingBehavior = ScrollableDefaults.flingBehavior(),
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                    ) {
-                        items(dataStatus.data) { todo ->
-                            TodoListCardTemplate(
-                                title = todo.title,
-                                priority = homeViewModel.convertStringToEnum(todo.priority),
-                                dueDate = todo.dueDate,
-                                status = todo.status,
-                                priorityColor = homeViewModel.changePriorityTextBackgroundColor(homeViewModel.convertStringToEnum(todo.priority)),
-                                modifier = Modifier
-                                    .padding(bottom = 12.dp),
-                                onCardClick = {
-                                    navController.navigate(PagesEnum.TodoDetail.name) {
-                                        popUpTo(PagesEnum.Home.name) {
-                                            inclusive = false
-                                        }
+                        Button(
+                            onClick = {
+                                navController.navigate(PagesEnum.CreateTodo.name) {
+                                    popUpTo(PagesEnum.Home.name) {
+                                        inclusive = false
                                     }
                                 }
+                            },
+                            contentPadding = PaddingValues(0.dp),
+                            colors = ButtonDefaults.buttonColors(Color.White),
+                            modifier = Modifier
+                                .size(40.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_add),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(20.dp)
                             )
                         }
                     }
-                    is TodoDataStatusUIState.Failed -> Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "No Task Found!",
-                            fontSize = 21.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    else -> Column(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        CircleLoadingTemplate(
-                            color = Color.White,
-                            trackColor = Color.Transparent,
-                        )
+
+                    when (dataStatus) {
+                        is TodoDataStatusUIState.Success -> if (dataStatus.data.size > 0) {
+                            LazyColumn(
+                                flingBehavior = ScrollableDefaults.flingBehavior(),
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                            ) {
+                                items(dataStatus.data) { todo ->
+                                    TodoListCardTemplate(
+                                        title = todo.title,
+                                        priority = homeViewModel.convertStringToEnum(todo.priority),
+                                        dueDate = todo.dueDate,
+                                        status = todo.status,
+                                        priorityColor = homeViewModel.changePriorityTextBackgroundColor(
+                                            homeViewModel.convertStringToEnum(todo.priority)
+                                        ),
+                                        modifier = Modifier
+                                            .padding(bottom = 12.dp),
+                                        onCardClick = {
+                                            todoDetailViewModel.getTodo(token, todo.id, navController)
+                                        }
+                                    )
+                                }
+                            }
+                        } else {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "No Task Found!",
+                                    fontSize = 21.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                        is TodoDataStatusUIState.Failed -> Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "No Task Found!",
+                                fontSize = 21.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        else -> Column(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            CircleLoadingTemplate(
+                                color = Color.White,
+                                trackColor = Color.Transparent,
+                            )
+                        }
                     }
                 }
             }
         }
     }
+
 }
 
 @Preview(
@@ -217,6 +261,8 @@ fun HomeViewPreview() {
             .background(Color.White),
         homeViewModel = viewModel(factory = HomeViewModel.Factory),
         navController = rememberNavController(),
-        token = ""
+        token = "",
+        todoDetailViewModel = viewModel(factory = TodoDetailViewModel.Factory),
+        context = LocalContext.current
     )
 }

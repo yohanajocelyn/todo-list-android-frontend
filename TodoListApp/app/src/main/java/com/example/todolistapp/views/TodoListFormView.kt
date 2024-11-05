@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,7 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.todolistapp.R
 import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.uiStates.AuthenticationStatusUIState
-import com.example.todolistapp.uiStates.TodoListFormStatusUIState
+import com.example.todolistapp.uiStates.StringDataStatusUIState
 import com.example.todolistapp.viewModels.TodoListFormViewModel
 import com.example.todolistapp.views.templates.CircleLoadingTemplate
 import com.example.todolistapp.views.templates.TodoListDatePicker
@@ -49,7 +50,7 @@ fun TodoListFormView(
 
     LaunchedEffect(todoListFormViewModel.submissionStatus) {
         val dataStatus = todoListFormViewModel.submissionStatus
-        if (dataStatus is TodoListFormStatusUIState.Failed) {
+        if (dataStatus is StringDataStatusUIState.Failed) {
             Toast.makeText(context, dataStatus.errorMessage, Toast.LENGTH_SHORT).show()
             todoListFormViewModel.clearErrorMessage()
         }
@@ -156,7 +157,11 @@ fun TodoListFormView(
             )
         }
 
-        Column {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Button(
                 onClick = {
                     navController.popBackStack()
@@ -169,7 +174,7 @@ fun TodoListFormView(
             }
 
             when(submissionStatus) {
-                is TodoListFormStatusUIState.Loading -> CircleLoadingTemplate(
+                is StringDataStatusUIState.Loading -> CircleLoadingTemplate(
                     color = Color.Blue,
                     trackColor = Color.Transparent,
                     modifier = Modifier

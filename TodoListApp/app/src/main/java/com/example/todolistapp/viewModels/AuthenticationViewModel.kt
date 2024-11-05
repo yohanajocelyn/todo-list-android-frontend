@@ -170,6 +170,8 @@ class AuthenticationViewModel(
 
                             dataStatus = AuthenticationStatusUIState.Success(res.body()!!.data)
 
+                            resetViewModel()
+
                             navController.navigate(PagesEnum.Home.name) {
                                 popUpTo(PagesEnum.Register.name) {
                                     inclusive = true
@@ -213,6 +215,8 @@ class AuthenticationViewModel(
                             saveUsernameToken(res.body()!!.data.token!!, res.body()!!.data.username)
 
                             dataStatus = AuthenticationStatusUIState.Success(res.body()!!.data)
+
+                            resetViewModel()
 
                             navController.navigate(PagesEnum.Home.name) {
                                 popUpTo(PagesEnum.Login.name) {

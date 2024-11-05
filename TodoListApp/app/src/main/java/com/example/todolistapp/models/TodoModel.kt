@@ -3,8 +3,12 @@ package com.example.todolistapp.models
 import com.example.todolistapp.enums.PrioritiesEnum
 import com.google.gson.annotations.SerializedName
 
-data class TodoResponse(
+data class GetAllTodoResponse(
     val data: List<TodoModel>
+)
+
+data class GetTodoResponse(
+    val data: TodoModel
 )
 
 data class TodoModel(

@@ -17,15 +17,20 @@ import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.enums.PrioritiesEnum
 import com.example.todolistapp.models.ErrorModel
 import com.example.todolistapp.models.GeneralResponseModel
-import com.example.todolistapp.models.TodoResponse
+import com.example.todolistapp.models.GetAllTodoResponse
 import com.example.todolistapp.repositories.TodoRepository
 import com.example.todolistapp.repositories.UserRepository
-import com.example.todolistapp.uiStates.LogoutStatusUIState
+import com.example.todolistapp.uiStates.AuthenticationUIState
+import com.example.todolistapp.uiStates.HomeUIState
+import com.example.todolistapp.uiStates.StringDataStatusUIState
 import com.example.todolistapp.uiStates.TodoDataStatusUIState
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -36,14 +41,14 @@ class HomeViewModel(
     private val userRepository: UserRepository,
     private val todoRepository: TodoRepository
 ): ViewModel() {
-//    private val _todoModel = MutableStateFlow<MutableList<TodoModel>>(mutableListOf())
-//
-//    val todoModel: StateFlow<List<TodoModel>>
-//        get() {
-//            return _todoModel.asStateFlow()
-//        }
+    private val _homeUIState = MutableStateFlow(HomeUIState())
 
-    var logoutStatus: LogoutStatusUIState by mutableStateOf(LogoutStatusUIState.Start)
+    val homeUIState: StateFlow<HomeUIState>
+        get() {
+            return _homeUIState.asStateFlow()
+        }
+
+    var logoutStatus: StringDataStatusUIState by mutableStateOf(StringDataStatusUIState.Start)
         private set
 
     var dataStatus: TodoDataStatusUIState by mutableStateOf(TodoDataStatusUIState.Start)
@@ -61,6 +66,14 @@ class HomeViewModel(
         initialValue = ""
     )
 
+    fun clearDialog() {
+        _homeUIState.update { state ->
+            state.copy(
+                showDialog = false
+            )
+        }
+    }
+
     fun changePriorityTextBackgroundColor(
         priority: PrioritiesEnum
     ): Color {
@@ -75,7 +88,7 @@ class HomeViewModel(
 
     fun logoutUser(token: String, navController: NavHostController) {
         viewModelScope.launch {
-            logoutStatus = LogoutStatusUIState.Loading
+            logoutStatus = StringDataStatusUIState.Loading
 
             Log.d("token-logout", "LOGOUT TOKEN: ${token}")
 
@@ -85,7 +98,7 @@ class HomeViewModel(
                 call.enqueue(object: Callback<GeneralResponseModel>{
                     override fun onResponse(call: Call<GeneralResponseModel>, res: Response<GeneralResponseModel>) {
                         if (res.isSuccessful) {
-                            logoutStatus = LogoutStatusUIState.Success(responseData = res.body()!!.data)
+                            logoutStatus = StringDataStatusUIState.Success(data = res.body()!!.data)
 
                             saveUsernameToken("Unknown", "Unknown")
 
@@ -100,18 +113,18 @@ class HomeViewModel(
                                 ErrorModel::class.java
                             )
 
-                            logoutStatus = LogoutStatusUIState.Failed(errorMessage.errors)
+                            logoutStatus = StringDataStatusUIState.Failed(errorMessage.errors)
                             // set error message toast
                         }
                     }
 
                     override fun onFailure(call: Call<GeneralResponseModel>, t: Throwable) {
-                        logoutStatus = LogoutStatusUIState.Failed(t.localizedMessage)
+                        logoutStatus = StringDataStatusUIState.Failed(t.localizedMessage)
                         Log.d("logout-failure", t.localizedMessage)
                     }
                 })
             } catch (error: IOException) {
-                logoutStatus = LogoutStatusUIState.Failed(error.localizedMessage)
+                logoutStatus = StringDataStatusUIState.Failed(error.localizedMessage)
                 Log.d("logout-error", error.localizedMessage)
             }
         }
@@ -125,8 +138,8 @@ class HomeViewModel(
 
             try {
                 val call = todoRepository.getAllTodos(token)
-                call.enqueue(object : Callback<TodoResponse> {
-                    override fun onResponse(call: Call<TodoResponse>, res: Response<TodoResponse>) {
+                call.enqueue(object : Callback<GetAllTodoResponse> {
+                    override fun onResponse(call: Call<GetAllTodoResponse>, res: Response<GetAllTodoResponse>) {
                         if (res.isSuccessful) {
                             dataStatus = TodoDataStatusUIState.Success(res.body()!!.data)
 
@@ -141,7 +154,7 @@ class HomeViewModel(
                         }
                     }
 
-                    override fun onFailure(call: Call<TodoResponse>, t: Throwable) {
+                    override fun onFailure(call: Call<GetAllTodoResponse>, t: Throwable) {
                         dataStatus = TodoDataStatusUIState.Failed(t.localizedMessage)
                     }
 
@@ -178,5 +191,13 @@ class HomeViewModel(
             userRepository.saveUserToken(token)
             userRepository.saveUsername(username)
         }
+    }
+
+    fun clearLogoutErrorMessage() {
+        logoutStatus = StringDataStatusUIState.Start
+    }
+
+    fun clearDataErrorMessage() {
+        dataStatus = TodoDataStatusUIState.Start
     }
 }

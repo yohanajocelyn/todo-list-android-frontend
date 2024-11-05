@@ -22,7 +22,7 @@ import com.example.todolistapp.models.ErrorModel
 import com.example.todolistapp.models.GeneralResponseModel
 import com.example.todolistapp.repositories.TodoRepository
 import com.example.todolistapp.repositories.UserRepository
-import com.example.todolistapp.uiStates.TodoListFormStatusUIState
+import com.example.todolistapp.uiStates.StringDataStatusUIState
 import com.example.todolistapp.uiStates.TodoListFormUIState
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,7 +56,7 @@ class TodoListFormViewModel(
         initialValue = ""
     )
 
-    var submissionStatus: TodoListFormStatusUIState by mutableStateOf(TodoListFormStatusUIState.Start)
+    var submissionStatus: StringDataStatusUIState by mutableStateOf(StringDataStatusUIState.Start)
         private set
 
     var titleInput by mutableStateOf("")
@@ -189,7 +189,7 @@ class TodoListFormViewModel(
 
     fun createTodo(navController: NavHostController, token: String) {
         viewModelScope.launch {
-            submissionStatus = TodoListFormStatusUIState.Loading
+            submissionStatus = StringDataStatusUIState.Loading
 
             Log.d("token-todo-list-form", "TOKEN: ${token}")
 
@@ -203,7 +203,7 @@ class TodoListFormViewModel(
                     ) {
                         if (res.isSuccessful) {
                             Log.d("json", "JSON RESPONSE: ${res.body()!!.data}")
-                            submissionStatus = TodoListFormStatusUIState.Success(res.body()!!.data)
+                            submissionStatus = StringDataStatusUIState.Success(res.body()!!.data)
 
                             navController.navigate(PagesEnum.Home.name) {
                                 popUpTo(PagesEnum.CreateTodo.name) {
@@ -216,22 +216,22 @@ class TodoListFormViewModel(
                                 ErrorModel::class.java
                             )
 
-                            submissionStatus = TodoListFormStatusUIState.Failed(errorMessage.errors)
+                            submissionStatus = StringDataStatusUIState.Failed(errorMessage.errors)
                         }
                     }
 
                     override fun onFailure(call: Call<GeneralResponseModel>, t: Throwable) {
-                        submissionStatus = TodoListFormStatusUIState.Failed(t.localizedMessage)
+                        submissionStatus = StringDataStatusUIState.Failed(t.localizedMessage)
                     }
 
                 })
             } catch (error: IOException) {
-                submissionStatus = TodoListFormStatusUIState.Failed(error.localizedMessage)
+                submissionStatus = StringDataStatusUIState.Failed(error.localizedMessage)
             }
         }
     }
 
     fun clearErrorMessage() {
-        submissionStatus = TodoListFormStatusUIState.Start
+        submissionStatus = StringDataStatusUIState.Start
     }
 }
