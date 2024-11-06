@@ -37,7 +37,7 @@ class TodoDetailViewModel(
     var deleteStatus: StringDataStatusUIState by mutableStateOf(StringDataStatusUIState.Start)
         private set
 
-    fun getTodo(token: String, todoId: Int, navController: NavHostController) {
+    fun getTodo(token: String, todoId: Int, navController: NavHostController, isUpdating: Boolean) {
         viewModelScope.launch {
             dataStatus = TodoDetailDataStatusUIState.Loading
 
@@ -51,9 +51,13 @@ class TodoDetailViewModel(
 
                             Log.d("get-todo-result", "GET TODO: ${res.body()}")
 
-                            navController.navigate(PagesEnum.TodoDetail.name) {
-                                popUpTo(PagesEnum.Home.name) {
-                                    inclusive = false
+                            if (isUpdating) {
+                                navController.popBackStack()
+                            } else {
+                                navController.navigate(PagesEnum.TodoDetail.name) {
+                                    popUpTo(PagesEnum.Home.name) {
+                                        inclusive = false
+                                    }
                                 }
                             }
                         } else {

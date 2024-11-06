@@ -20,6 +20,7 @@ import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.enums.PrioritiesEnum
 import com.example.todolistapp.models.ErrorModel
 import com.example.todolistapp.models.GeneralResponseModel
+import com.example.todolistapp.models.TodoModel
 import com.example.todolistapp.repositories.TodoRepository
 import com.example.todolistapp.repositories.UserRepository
 import com.example.todolistapp.uiStates.StringDataStatusUIState
@@ -55,6 +56,12 @@ class TodoListFormViewModel(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = ""
     )
+
+    var todoId by mutableStateOf(-1)
+        private set
+
+    var isUpdate by mutableStateOf(false)
+        private set
 
     var submissionStatus: StringDataStatusUIState by mutableStateOf(StringDataStatusUIState.Start)
         private set
@@ -205,6 +212,8 @@ class TodoListFormViewModel(
                             Log.d("json", "JSON RESPONSE: ${res.body()!!.data}")
                             submissionStatus = StringDataStatusUIState.Success(res.body()!!.data)
 
+                            resetViewModel()
+
                             navController.navigate(PagesEnum.Home.name) {
                                 popUpTo(PagesEnum.CreateTodo.name) {
                                     inclusive = true
@@ -233,5 +242,80 @@ class TodoListFormViewModel(
 
     fun clearErrorMessage() {
         submissionStatus = StringDataStatusUIState.Start
+    }
+
+    fun updateTodo(token: String, getTodo: () -> Unit) {
+        viewModelScope.launch {
+            submissionStatus = StringDataStatusUIState.Loading
+
+            try {
+                val call = todoRepository.updateTodo(token, todoId, titleInput, descriptionInput, dueDateInput, statusInput, priorityInput)
+
+                call.enqueue(object: Callback<GeneralResponseModel> {
+                    override fun onResponse(
+                        call: Call<GeneralResponseModel>,
+                        res: Response<GeneralResponseModel>
+                    ) {
+                        if (res.isSuccessful) {
+                            submissionStatus = StringDataStatusUIState.Success(res.body()!!.data)
+
+                            resetViewModel()
+
+                            getTodo()
+                        } else {
+                            val errorMessage = Gson().fromJson(
+                                res.errorBody()!!.charStream(),
+                                ErrorModel::class.java
+                            )
+
+                            submissionStatus = StringDataStatusUIState.Failed(errorMessage.errors)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<GeneralResponseModel>, t: Throwable) {
+                        submissionStatus = StringDataStatusUIState.Failed(t.localizedMessage)
+                    }
+
+                })
+            } catch (error: IOException) {
+                submissionStatus = StringDataStatusUIState.Failed(error.localizedMessage)
+            }
+        }
+    }
+
+    fun navigateToUpdateForm(navController: NavHostController, todoModel: TodoModel) {
+        titleInput = todoModel.title
+        descriptionInput = todoModel.description
+        dueDateInput = todoModel.dueDate
+        statusInput = todoModel.status
+        priorityInput = todoModel.priority
+        todoId = todoModel.id
+
+        isUpdate = true
+
+        navController.navigate(PagesEnum.CreateTodo.name) {
+            popUpTo(PagesEnum.TodoDetail.name) {
+                inclusive = false
+            }
+        }
+    }
+
+    fun resetViewModel() {
+        submissionStatus = StringDataStatusUIState.Start
+        titleInput = ""
+        descriptionInput = ""
+        dueDateInput = ""
+        statusInput = ""
+        priorityInput = ""
+        isUpdate = false
+
+        _todoListFormUIState.update { state ->
+            state.copy(
+                false,
+                false,
+                showDatePickerDialog = false,
+                saveButtonEnabled = false
+            )
+        }
     }
 }

@@ -31,6 +31,7 @@ import com.example.todolistapp.R
 import com.example.todolistapp.enums.PagesEnum
 import com.example.todolistapp.uiStates.AuthenticationStatusUIState
 import com.example.todolistapp.uiStates.StringDataStatusUIState
+import com.example.todolistapp.viewModels.TodoDetailViewModel
 import com.example.todolistapp.viewModels.TodoListFormViewModel
 import com.example.todolistapp.views.templates.CircleLoadingTemplate
 import com.example.todolistapp.views.templates.TodoListDatePicker
@@ -43,7 +44,8 @@ fun TodoListFormView(
     modifier: Modifier = Modifier,
     context: Context,
     navController: NavHostController,
-    token: String
+    token: String,
+    todoDetailViewModel: TodoDetailViewModel
 ) {
     val todoListFormUIState = todoListFormViewModel.todoListFormUIState.collectAsState()
     val submissionStatus = todoListFormViewModel.submissionStatus
@@ -164,6 +166,7 @@ fun TodoListFormView(
         ) {
             Button(
                 onClick = {
+                    todoListFormViewModel.resetViewModel()
                     navController.popBackStack()
                 },
                 modifier = Modifier
@@ -182,8 +185,15 @@ fun TodoListFormView(
                 )
                 else -> Button(
                     onClick = {
-                        // TODO: Add on save button click event handler
-                        todoListFormViewModel.createTodo(navController, token = token)
+                        // TODO: Check if the view model should update or create
+                        if (todoListFormViewModel.isUpdate) {
+                            todoListFormViewModel.updateTodo(token, getTodo =  {
+                                todoDetailViewModel.getTodo(token, todoListFormViewModel.todoId, navController, todoListFormViewModel.isUpdate)
+                            })
+                        } else {
+                            todoListFormViewModel.createTodo(navController, token = token)
+                        }
+
                     },
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -212,6 +222,7 @@ fun CreateTodoListViewPreview() {
         context = LocalContext.current,
         navController = rememberNavController(),
         todoListFormViewModel = viewModel(factory = TodoListFormViewModel.Factory),
-        token = ""
+        token = "",
+        todoDetailViewModel = viewModel(factory = TodoDetailViewModel.Factory)
     )
 }

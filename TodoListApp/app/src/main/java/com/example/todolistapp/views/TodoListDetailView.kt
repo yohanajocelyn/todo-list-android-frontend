@@ -40,6 +40,7 @@ import com.example.todolistapp.uiStates.StringDataStatusUIState
 import com.example.todolistapp.uiStates.TodoDataStatusUIState
 import com.example.todolistapp.uiStates.TodoDetailDataStatusUIState
 import com.example.todolistapp.viewModels.TodoDetailViewModel
+import com.example.todolistapp.viewModels.TodoListFormViewModel
 
 @Composable
 fun TodoListDetailView (
@@ -47,7 +48,8 @@ fun TodoListDetailView (
     navController: NavHostController,
     token: String,
     todoDetailViewModel: TodoDetailViewModel,
-    context: Context
+    context: Context,
+    todoListFormViewModel: TodoListFormViewModel
 ) {
     val dataStatus = todoDetailViewModel.dataStatus
     val deleteStatus = todoDetailViewModel.deleteStatus
@@ -89,11 +91,7 @@ fun TodoListDetailView (
                 Row {
                     Button(
                         onClick = {
-                            navController.navigate(PagesEnum.CreateTodo.name) {
-                                popUpTo(PagesEnum.TodoDetail.name) {
-                                    inclusive = false
-                                }
-                            }
+                            todoListFormViewModel.navigateToUpdateForm(navController, dataStatus.data)
                         },
                         contentPadding = PaddingValues(0.dp),
                         modifier = Modifier
@@ -257,6 +255,7 @@ fun TodoListDetailViewPreview() {
         navController = rememberNavController(),
         token = "",
         todoDetailViewModel = viewModel(factory = TodoDetailViewModel.Factory),
-        context = LocalContext.current
+        context = LocalContext.current,
+        todoListFormViewModel = viewModel(factory = TodoListFormViewModel.Factory)
     )
 }

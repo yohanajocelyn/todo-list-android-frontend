@@ -64,20 +64,22 @@ fun HomeView(
     val logoutStatus = homeViewModel.logoutStatus
     val dataStatus = homeViewModel.dataStatus
 
-    LaunchedEffect(true) {
-        homeViewModel.getAllTodos(token)
+    LaunchedEffect(token) {
+        if (token != "Unknown") {
+            homeViewModel.getAllTodos(token)
+        }
     }
 
     LaunchedEffect(logoutStatus) {
         if (logoutStatus is StringDataStatusUIState.Failed) {
-            Toast.makeText(context, logoutStatus.errorMessage, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "LOGOUT ERROR: ${logoutStatus.errorMessage}", Toast.LENGTH_SHORT).show()
             homeViewModel.clearLogoutErrorMessage()
         }
     }
 
     LaunchedEffect(dataStatus) {
         if (dataStatus is TodoDataStatusUIState.Failed) {
-            Toast.makeText(context, dataStatus.errorMessage, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "DATA ERROR: ${dataStatus.errorMessage}", Toast.LENGTH_SHORT).show()
             homeViewModel.clearDataErrorMessage()
         }
     }
@@ -180,7 +182,7 @@ fun HomeView(
                     }
 
                     when (dataStatus) {
-                        is TodoDataStatusUIState.Success -> if (dataStatus.data.size > 0) {
+                        is TodoDataStatusUIState.Success -> if (dataStatus.data.isNotEmpty()) {
                             LazyColumn(
                                 flingBehavior = ScrollableDefaults.flingBehavior(),
                                 modifier = Modifier
@@ -199,7 +201,7 @@ fun HomeView(
                                         modifier = Modifier
                                             .padding(bottom = 12.dp),
                                         onCardClick = {
-                                            todoDetailViewModel.getTodo(token, todo.id, navController)
+                                            todoDetailViewModel.getTodo(token, todo.id, navController, false)
                                         }
                                     )
                                 }
@@ -207,7 +209,7 @@ fun HomeView(
                         } else {
                             Column(
                                 modifier = Modifier
-                                    .fillMaxSize(),
+                                    .fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {

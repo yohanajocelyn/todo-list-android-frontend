@@ -43,11 +43,6 @@ class HomeViewModel(
 ): ViewModel() {
     private val _homeUIState = MutableStateFlow(HomeUIState())
 
-    val homeUIState: StateFlow<HomeUIState>
-        get() {
-            return _homeUIState.asStateFlow()
-        }
-
     var logoutStatus: StringDataStatusUIState by mutableStateOf(StringDataStatusUIState.Start)
         private set
 

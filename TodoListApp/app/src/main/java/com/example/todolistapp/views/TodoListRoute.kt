@@ -79,7 +79,8 @@ fun TodoListApp(
                 context = localContext,
                 todoListFormViewModel =  todoListFormViewModel,
                 navController = navController,
-                token = token.value
+                token = token.value,
+                todoDetailViewModel = todoDetailViewModel
             )
         }
 
@@ -91,7 +92,8 @@ fun TodoListApp(
                 navController = navController,
                 token = token.value,
                 todoDetailViewModel = todoDetailViewModel,
-                context = localContext
+                context = localContext,
+                todoListFormViewModel = todoListFormViewModel
             )
         }
     }
