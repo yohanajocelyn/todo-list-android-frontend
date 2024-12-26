@@ -25,7 +25,7 @@ fun TodoListApp(
     navController: NavHostController = rememberNavController(),
     homeViewModel: HomeViewModel = viewModel(),
     todoListFormViewModel: TodoListFormViewModel = viewModel(),
-    authenticationViewModel: AuthenticationViewModel = viewModel()
+    authenticationViewModel: AuthenticationViewModel = viewModel(factory = AuthenticationViewModel.Factory)
 ) {
     val localContext = LocalContext.current
 

@@ -169,11 +169,7 @@ fun RegisterView(
             AuthenticationButton(
                 buttonText = stringResource(id = R.string.registerText),
                 onButtonClick = {
-                    navController.navigate(PagesEnum.Home.name) {
-                        popUpTo(PagesEnum.Register.name) {
-                            inclusive = true
-                        }
-                    }
+                    authenticationViewModel.registerUser(navController)
                 },
                 buttonModifier = Modifier
                     .padding(top = 30.dp),

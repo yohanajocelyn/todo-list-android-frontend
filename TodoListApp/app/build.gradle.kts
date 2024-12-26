@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.todolistapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.todolistapp"
@@ -67,4 +67,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // dependencies tambahan
+    implementation("androidx.datastore:datastore-preferences:1.0.0") //untuk persist data
+    implementation("com.squareup.retrofit2:retrofit:2.11.0") // untuk request ke backend
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0") //untuk convert json
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0") //untuk logging
 }

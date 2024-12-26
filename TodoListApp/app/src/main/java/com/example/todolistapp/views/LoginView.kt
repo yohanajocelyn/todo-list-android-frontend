@@ -115,15 +115,12 @@ fun LoginView(
                     onDone = null
                 )
             )
-
+            //add the login logc here
             AuthenticationButton(
                 buttonText = stringResource(id = R.string.loginText),
                 onButtonClick = {
-                    navController.navigate(PagesEnum.Home.name) {
-                        popUpTo(PagesEnum.Login.name) {
-                            inclusive = true
-                        }
-                    }
+                    //masukkan logika di sini
+                    authenticationViewModel.loginUser(navController)
                 },
                 buttonModifier = Modifier
                     .padding(top = 30.dp),

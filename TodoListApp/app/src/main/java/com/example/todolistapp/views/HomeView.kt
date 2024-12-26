@@ -52,7 +52,8 @@ fun HomeView(
         modifier = modifier
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            //isi token pakai
+            onClick = { homeViewModel.logoutUser(token = },
             modifier = Modifier
                 .align(alignment = Alignment.End)
                 .padding(end = 10.dp, top = 10.dp)
